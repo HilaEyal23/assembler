@@ -42,14 +42,14 @@ void preprocess(FILE *inputFile, char *filesName){
                     strcpy(linesCopy, line);
                     token = strtok(linesCopy, " \t\n");
                     if(!strcmp(token, "endmacro")){
-                        insert_macro(&head, macroName, macroContent); /*to be fixed*/
+                        /*insert_macro(&head, macroName, macroContent); to be fixed*/
                         isMacroDef = false;
                         continue;
                     }
                     else{
-                        printf("macro content\n");
+                        fprintf(amFile,"macro content\n");
                         strcat(macroContent, line);
-                        macroContent = (char*)realloc(linesCopy, sizeof(MAX_LINE_LENGTH)); /*to be fixed*/
+                        /*macroContent = (char*)realloc(linesCopy,MAX_LINE_LENGTH * sizeof(char)); to be fixed*/
                         if(!macroContent){
                             printf("error with allocation\n");
                             exit(0);
@@ -67,6 +67,7 @@ void preprocess(FILE *inputFile, char *filesName){
             continue;
         }
     }
+    fprintf(amFile,"preprocess end\n");
     free(macroContent);
     fclose(amFile);
     return;
