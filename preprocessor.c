@@ -63,7 +63,8 @@ void preprocess(FILE *inputFile, char *filesName){
                 }
             }
             else{
-                fputs(find_macro(&head, token)->content ,amFile);
+                swich_name_with_content(&head, token, amFile);
+                /*fputs(find_macro(&head, token)->content ,amFile);*/
                 continue;
             }
 

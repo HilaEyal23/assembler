@@ -32,3 +32,14 @@ macro* find_macro(macroNode *head, char *macroName){
     return NULL;
 }
 
+void swich_name_with_content(macroNode *head, char macroName[], FILE *amFile){
+    char content[MAX_LINE_LENGTH] = {0};
+    char *ptr = find_macro(head, macroName)->content;
+
+    while(ptr){
+        strncpy(content, ptr, MAX_LINE_LENGTH);
+        ptr = ptr + MAX_LINE_LENGTH;
+        fprintf(amFile, "%s", content);
+    }
+}
+
