@@ -37,35 +37,42 @@ void preprocess(FILE *inputFile, char *filesName){
                     token = strtok(NULL, " \t\n");
                     strcpy(macroName, token);
                 }
-                while(isMacroDef){
-                    fgets(line, MAX_LINE_LENGTH, inputFile);
-                    strcpy(linesCopy, line);
-                    token = strtok(linesCopy, " \t\n");
-                    if(!strcmp(token, "endmacro")){
-                        /*insert_macro(&head, macroName, macroContent); to be fixed*/
-                        isMacroDef = false;
-                        continue;
-                    }
-                    else{
-                        fprintf(amFile,"macro content\n");
-                        strcat(macroContent, line);
-                        /*macroContent = (char*)realloc(linesCopy,MAX_LINE_LENGTH * sizeof(char)); to be fixed*/
-                        if(!macroContent){
-                            printf("error with allocation\n");
-                            exit(0);
+                if(isMacroDef){
+                    while(isMacroDef){
+                        fgets(line, MAX_LINE_LENGTH, inputFile);
+                        strcpy(linesCopy, line);
+                        token = strtok(linesCopy, " \t\n");
+                        if(!strcmp(token, "endmacro")){
+                            /*insert_macro(&head, macroName, macroContent); to be fixed*/
+                            isMacroDef = false;
+                            continue;
+                        }
+                        else{
+                            fprintf(amFile,"macro content\n");
+                            strcat(macroContent, line);
+                            /*macroContent = (char*)realloc(linesCopy,MAX_LINE_LENGTH * sizeof(char)); to be fixed*/
+                            if(!macroContent){
+                                printf("error with allocation\n");
+                                exit(0);
+                            }
                         }
                     }
+                }
+                else{
+                    fputs(line, amFile);
                 }
             }
             else{
                 fputs(find_macro(&head, token)->content ,amFile);
                 continue;
             }
+
         }
         else{
             fputs(line, amFile);
             continue;
         }
+
     }
     fprintf(amFile,"preprocess end\n");
     free(macroContent);
