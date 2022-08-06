@@ -19,24 +19,6 @@ int is_int(char s[]){
     return true;
 }
 
-/*void skipEmpty(char line[]){
-    int cnt = 0, i = 0;
-    int strLen = strlen(line);
-    while(i<strLen){
-        if(line[i] != ' ' && line[i] != TAB)
-            break;
-        i++;
-        cnt++;
-    }
-    memmove(line, line + cnt, strlen(line));
-}*/
-/*int toBeSkipped(char line[]){
-    skipEmpty(line);
-    if(line[0] == '\0' || line[0] == ';' || line[0] == '\n')
-        return true;
-    return false;
-}*/
-
 int skipEmpty(char *line, int i){
     for(; i < strlen(line); i++)
     {
