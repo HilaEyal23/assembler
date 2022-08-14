@@ -36,7 +36,7 @@ void preprocess(FILE *fp, char *fileName){
         puts(token);
         if(macro_exists(head, token)){
             puts("hi");
-            stream_macro(preprocessedFile, head, token);
+            stream_macro(preprocessedFile, head, name);
         }
         else if(!strncmp(token, "macro", 5)){
             macroFlag = true;
@@ -49,8 +49,9 @@ void preprocess(FILE *fp, char *fileName){
             if(!strncmp(token,"endmacro", 8)){
                 macroFlag = false;
                 insert_at_end(&head, name, content);
-                print_macro_list(head);
+                
                 content = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
+                p = NULL;
                 i = 1;
             }
             else{        
@@ -58,6 +59,7 @@ void preprocess(FILE *fp, char *fileName){
                 if(p == NULL) printf("error with allocation!");
                 else content = p;         
                 strcat(content, lineCopy);
+                
             }
         }
         else{

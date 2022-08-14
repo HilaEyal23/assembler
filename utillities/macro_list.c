@@ -69,7 +69,7 @@ macroNode* init_macro_node(macroNode* next, char* name, char* content)
 int macro_exists(macroNode *head, char *macroName){
     macroNode *currNode = head;
     while(currNode != NULL){
-        if(!strncmp(currNode->currMacro.name, macroName,1)) return true;
+        if(!strcmp(currNode->currMacro.name, macroName)) return true;
         currNode = currNode->next;
     }
     return false;

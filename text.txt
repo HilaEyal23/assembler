@@ -11,6 +11,11 @@ m1
  bne LOOP
 END: hlt
 STR: .string "abcdef"
+macro m2
+shlomo homo
+123
+endmacro
 LENGTH: .data 6,-9,15
+m2
 K: .data 22
 S1: .struct 8, "ab"
