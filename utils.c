@@ -1,6 +1,6 @@
 #include "utils.h"
 
-int is_cmd(char str[]){
+/*int is_cmd(char str[]){
     int i;
     for(i=0; i<CMD_AMOUNT; i++){
         if(!strcmp(str,ourCmd[i].name)){
@@ -17,21 +17,29 @@ int is_int(char s[]){
             return false;
     }
     return true;
-}
+}*/
 
-int skipEmpty(char *line, int i){
-    for(; i < strlen(line); i++)
-    {
-        if(!(isspace(line[i]) || line[i]==TAB))
-            return i;
+void skip_spaces(char **p){
+    while((*p)[0] == ' ' || (*p)[0] == TAB) {
+        *p += 1;
     }
-    return i;
 }
 
 int toBeSkipped(char line[]){
-    int i = 0;
-    i = skipEmpty(line, i);
-    if(line[i] == '\0' || line[i] == ';' || line[i] == '\n')
-        return true;
     return false;
 }
+
+int space_line(char *line){
+    int i = 0;
+    skip_spaces(&line);
+    if(line[i] =='\n' || line[i] == '\0') return true;
+    return false;
+}
+
+int comment_line(char *line){
+    int i = 0;
+    skip_spaces(&line);
+    if(line[i] ==';') return true;
+    return false;
+}
+
