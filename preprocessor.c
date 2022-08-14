@@ -58,7 +58,6 @@ void preprocess(FILE *fp, char *fileName){
                 if(p == NULL) printf("error with allocation!");
                 else content = p;         
                 strcat(content, lineCopy);
-                /*puts(content);*/
             }
         }
         else{
