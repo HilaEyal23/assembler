@@ -21,6 +21,19 @@ void insert_macro(macroNode *head, char macroName[], char **content){
     
     return;
 }
+
+void stream_macro(FILE *fp, macroNode *head, char *name){
+    macro *macro = find_macro(head, name);
+    char *token;
+    token = strtok(macro->content, "\t\n");
+    while( token != NULL ) {
+      fputs(token,fp);
+      token = strtok(NULL, "\t\n");
+   }
+   return;
+
+}
+
 void insert_at_end(macroNode** head, char *name, char* content)
 {
     macroNode *temp = *head;

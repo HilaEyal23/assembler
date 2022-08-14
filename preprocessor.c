@@ -36,7 +36,7 @@ void preprocess(FILE *fp, char *fileName){
         puts(token);
         if(macro_exists(head, token)){
             puts("hi");
-            /*stream_macro();*/
+            stream_macro(preprocessedFile, head, token);
         }
         else if(!strncmp(token, "macro", 5)){
             macroFlag = true;

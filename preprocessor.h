@@ -24,6 +24,7 @@ typedef struct macroNode{
  *
  
  */
+ void stream_macro(FILE *fp, macroNode *head, char *name);
  void insert_at_end(macroNode** head, char *name, char* content);
  void print_macro_list(macroNode* head);
  macroNode* init_macro_node(macroNode* next, char* name, char* content);
