@@ -1,7 +1,7 @@
 FLAGS = -ansi -Wall -pedantic
 
 main: main.o firstPass.o symbolList.o operationTable.o secondPass.o utils.o
-	gcc -g $(FLAGS) firstPass.o symbolList.o operationTable.o secondPass.o utils.o -o main -lm
+	gcc -g $(FLAGS) firstPass.o symbolList.o operationTable.o secondPass.o utils.o main.o -o main -lm
 symbolList.o: symbolList.c
 	gcc -c  $(FLAGS) symbolList.c -o symbolList.o
 firstPass.o: firstPass.c

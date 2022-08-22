@@ -7,7 +7,6 @@ int cmd_cnt = 0;
 dirLine dirArray[40];
 int dir_cnt = 0;
 
-
 cmd ourCmd[] = {
         {"mov", MOV, 2},
         {"cmp", CMP, 2},
@@ -39,6 +38,7 @@ Register ourRegisters[] = {
         {"r6", 6},
         {"r7", 7}
 };
+
 
 void first_pass(FILE *fp, char *fileName){
     int lineNumber = 1;
