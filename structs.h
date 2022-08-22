@@ -3,51 +3,40 @@
 
 #include "globals.h"
 
-typedef struct structLabels * labelPtr;
-
-typedef struct label{
-    char name[MAX_NAME_LENGTH];
-    unsigned int address;
-    boolean external;
-    boolean isActionStatement;
-    boolean entry;
-    labelPtr next;
-}label;
-
-typedef struct ext * extPtr;
-typedef struct ext {
-    char name[MAX_NAME_LENGTH];
-    unsigned int address;
-    extPtr next;
-    extPtr prev;
-} ext;
+#define BITS_IN_WORD 10
+#define CMD_LENGTH 4
 
 typedef struct word{
-    unsigned int opcode[5];
-    unsigned int src[3];
-    unsigned int dst[3];
-    unsigned int ARE[3];
-}word;
+    unsigned int bits : BITS_IN_WORD;
+} word;
 
-typedef struct receivedLine{
-    char line[MAX_LINE_LENGTH];
+typedef struct cmdLine{
     int cmdIDX;
-    int errorType;
-    char operandsValues[OPERAND_TYPES_AMOUNT][MAX_NUM_OF_OPERANDS];
+    char src[MAX_NAME_LENGTH];
+    int srcType;
+    char dest[MAX_NAME_LENGTH];
+    int destType;
     int numOfOperands;
-    flag entryFlag;
-    flag externFlag;
-    /*int opcode;
-    int src_operand;
-    int dst_operand;
-    int offset;*/
-}receivedLine;
+    int lineNum;
+}cmdLine;
+
+
+
+typedef struct dirLine{
+    int dirType;
+    char *operand;
+    int lineNum;
+}dirLine;
+
+
 
 typedef struct cmd{
     char name[CMD_LENGTH];
     int cmdCode;
     int numOfOperands;
 }cmd;
+
+
 
 cmd ourCmd[] = {
         {"mov", MOV, 2},
@@ -66,47 +55,49 @@ cmd ourCmd[] = {
         {"prn", PRN, 1},
         {"jsr", JSR, 1},
 
-        {"rst", RST, 0},
+        {"rts", RTS, 0},
         {"hlt", HLT, 0},
 };
+
 
 typedef struct Register{
     char *name;
     int num;
-    int data;
 }Register;
 
 Register ourRegisters[] = {
-        {"r0", 0, 0},
-        {"r1", 1, 0},
-        {"r2", 2, 0},
-        {"r3", 3, 0},
-        {"r4", 4, 0},
-        {"r5", 5, 0},
-        {"r6", 6, 0},
-        {"r7", 7, 0}
+
+        {"r0", 0},
+
+        {"r1", 1},
+
+        {"r2", 2},
+
+        {"r3", 3},
+
+        {"r4", 4},
+
+        {"r5", 5},
+
+        {"r6", 6},
+
+        {"r7", 7}
+
 };
 
+/*
 const char base32[32] = {
+
         '!', '@', '#', '$', '%', '^', '&', '*',
+
         '<','>', 'a', 'b', 'c','d', 'e', 'f',
+
         'g','h', 'i', 'j', 'k', 'l', 'm', 'n',
+
         'o', 'p','q', 'r', 's', 't', 'u', 'v'
-};
 
-const char *instructions[] = {
-        ".data", ".string", ".struct", ".entry", ".extern"
-};
+};*/
 
-/*typedef struct symbolNode{
-    symbol currSymbol;
-    struct symbolNode *next;
-}symbolNode;*/
-
-typedef struct wordNode{
-    word currWord;
-    struct wordNode *next;
-}wordNode;
 
 
 #endif /*_STRUCTS_H*/
