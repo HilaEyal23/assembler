@@ -20,23 +20,17 @@ typedef struct cmdLine{
     int lineNum;
 }cmdLine;
 
-
-
 typedef struct dirLine{
     int dirType;
     char *operand;
     int lineNum;
 }dirLine;
 
-
-
 typedef struct cmd{
     char name[CMD_LENGTH];
     int cmdCode;
     int numOfOperands;
 }cmd;
-
-
 
 cmd ourCmd[] = {
         {"mov", MOV, 2},
@@ -66,38 +60,23 @@ typedef struct Register{
 }Register;
 
 Register ourRegisters[] = {
-
         {"r0", 0},
-
         {"r1", 1},
-
         {"r2", 2},
-
         {"r3", 3},
-
         {"r4", 4},
-
         {"r5", 5},
-
         {"r6", 6},
-
         {"r7", 7}
-
 };
-
 /*
 const char base32[32] = {
-
         '!', '@', '#', '$', '%', '^', '&', '*',
-
         '<','>', 'a', 'b', 'c','d', 'e', 'f',
-
         'g','h', 'i', 'j', 'k', 'l', 'm', 'n',
-
         'o', 'p','q', 'r', 's', 't', 'u', 'v'
-
 };*/
 
 
-
 #endif /*_STRUCTS_H*/
+
