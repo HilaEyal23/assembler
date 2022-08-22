@@ -22,7 +22,8 @@ typedef struct cmdLine{
 
 typedef struct dirLine{
     int dirType;
-    char *operand;
+    char operands[20][MAX_NAME_LENGTH];
+	int operand_cnt;
     int lineNum;
 }dirLine;
 

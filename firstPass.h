@@ -40,6 +40,8 @@ int is_alpha_word(char *word);
 /******DEBUG TOOLS******/
 void print_cmdArray();
 void print_cmd_line(cmdLine line);
+void print_dirArray();
+void print_dir_line(dirLine line);
 
 
 #endif /*_FIRSTPASS_H*/
