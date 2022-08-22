@@ -48,9 +48,9 @@ void first_pass(FILE *fp, char *fileName){
                 if(symbol_exists(head ,label)){
                     printf("label is already defined!\n");
                 }
-                else{
-                    labelFlag = 1;
-                }
+                
+                labelFlag = 1;
+                
 				token = strtok(NULL, " \t\n");
             }
             if(is_direct(token, lineNumber)){
@@ -75,9 +75,9 @@ void first_pass(FILE *fp, char *fileName){
         lineNumber++;
         /*print_symbol_list(head);*/
     }
-    print_symbol_list(head);
-    print_cmdArray();
-	print_dirArray();
+    /*print_symbol_list(head);*/
+    /*print_cmdArray();*/
+	/*print_dirArray();*/
 }
 
 void print_dirArray(){
@@ -90,8 +90,8 @@ void print_dirArray(){
 int validate_input_form(char *line, int lineNumber){/*fix this function!!!*/
     char input[MAX_LINE_LENGTH];
     char *token;
-    int comma_cnt = 0;
-    int tokens_cnt = 0;
+    /*int comma_cnt = 0;*/
+    /*int tokens_cnt = 0;*/
     char *p = input;
     strcpy(input, line);
     skip_label(&p); /*skiping the label is there is one :)*/
@@ -217,7 +217,6 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     int args[2];
     int operand_num;
     int ef = 0;
-    int arg;
     int i;
 
     strcpy(input, line);
@@ -241,20 +240,36 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     strcpy(command, token);
     if(ef == false){
         operand_num = getOperandNum(command);
-        for(i = 0; i < operand_num; i++){
+        
+    if(ef == false){
+        operand_num = getOperandNum(command);
+        if(operand_num == 1){
+            token = strtok(NULL, " ,\t\n");
+            if(token == NULL){
+                printf("%d: missing argument!\n", lineNumber);
+                ef = true;
+            }
+            args[1] = get_operand_type(token);
+            if(args[1] == -1) printf("%d: not vaild argument!\n", lineNumber);
+            if((getDestinationOperand(command) & args[1]) == 0){
+                printf("%d: not vaild argument!\n", lineNumber);
+                ef = true;
+            }
+            strcpy(src_des[1], token);
+        }
+        else if(operand_num == 2){
+            for(i = 0; i < operand_num; i++){
             token = strtok(NULL, " ,\t\n");
             if(token == NULL){
                 printf("%d: missing argument!\n", lineNumber);
                 ef = true;
                 break;
             }
-            puts(token);
             args[i] = get_operand_type(token);
-            printf("%d\n", args[i]);
-
             if(args[i] == -1) printf("%d: not vaild argument!\n", lineNumber);
             if(i == 0){
                 if((getSourceOperand(command) & args[i]) == 0){
+                    printf("%d\n", getSourceOperand(command));
                     printf("%d: not vaild argument!\n", lineNumber);
                     ef = true;
                 }
@@ -267,6 +282,8 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
             }
             strcpy(src_des[i], token);
         }
+        }
+    }
 
         token = strtok(NULL, " \t\n");
         if(token != NULL){
@@ -342,19 +359,27 @@ third = reshima .struct
 fourth = register r1-r8
 */
 int get_operand_type(char *op){
-    int i = 1;
-    if (op[0] == '#') return FIRST_ADDRESS;
-    if(op[0] == 'r'){
+    int i = 0;
+    if (op[0] == '#'){
+        if(is_number(op+1)){
+            return FIRST_ADDRESS;
+        }
+    }
+    else if(op[0] == 'r'){
         if(op[1] <= '8' && op[1] >= '1') return FOURTH_ADDRESS;
     }
     while(op[i]){
         if(op[i] == '.'){
-            if(!isdigit(op[i+1])) return ERROR;
-            else return THIRD_ADDRESS;
+            if(isdigit(op[i+1])){
+                return THIRD_ADDRESS;
+            }
         }
         i++;
     }
-    return SECOND_ADDRESS;
+
+    if(is_alpha_word(op)) return SECOND_ADDRESS;
+    
+    return -1;
 
 }
 
@@ -388,8 +413,8 @@ int is_label(char *token, int lineNumber){
 
     for(i = 0; i < len-1; i++){
         if(isdigit(token[i])){
-            puts("error");
-            return false;
+            printf("%d: unvaild label name\n", lineNumber);
+            break;
         }
     }
     return true;

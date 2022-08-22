@@ -1,2 +1,18 @@
-K: .data 22,1,4,6,7,333,123
-.string "ilai"
+r3: add r3,r15 
+add: add r3,r15 
+LAB#EL1: move r5,r6
+LABEL1:move r5,r6
+move r1
+mov r1
+mov r1,r1,
+mov r1,,r1
+mov r1,#r
+mov r1,#10000000
+mov r1, #2
+lea r3,r3
+clr r1,r2
+.entry A
+.extern A
+mov r3,A[r1]
+mov r3,A[rrrr]
+mov r3,A[r12A]
