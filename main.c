@@ -6,8 +6,8 @@
 void first_pass(FILE *fp, char *fileName);
 void second_pass(cmdLine cmdLines[], char *fileName);
 
-extern int ic, dc;
-extern int err;
+int ic, dc;
+boolean ef;
 boolean was_error;
 extern const char base32[32];
 extern cmdLine cmdArray[2560];
@@ -15,11 +15,15 @@ extern dirLine dirArray[2560];
 extern word dirWordArr[2560];
 extern word cmdWordArr[2560];
 boolean entry_exists, extern_exists;
+int cmdCnt;
+int dirCnt;
 
 
 void reset_global_vars(){
     ic = 0;
     dc = 0;
+    cmdCnt = 0;
+    dirCnt = 0;
     /*err = NO_ERROR;*/
     entry_exists = false;
     extern_exists = false;

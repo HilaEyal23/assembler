@@ -3,8 +3,9 @@
 /*#include "symbolList.h"*/
 #include "externVars.h"
 
+extern int cmdCnt;
+extern int ic, dc;
 word cmdWordArr[2560];
-int ic, dc;
 
 void second_pass(cmdLine cmdLines[], char *fileName);
 int code_cmd_line(cmdLine *cmdPtr, int idx);
@@ -21,49 +22,6 @@ void create_entry_file(FILE *file);
 void create_extern_file(FILE *file);
 FILE *open_file(char *filename, int type);
 
-int cmdCnt = 4;
-
-/*int main(){
-    cmdLine cmdArr[20];
-    cmdLine line1;
-    cmdLine line2;
-    cmdLine line3;
-    cmdLine line4;
-
-    line1.cmdIDX = PRN;
-    line1.numOfOperands = 1;
-    line1.src = "5";
-    line1.srcType = IMMEDIATE;
-
-
-    line2.cmdIDX = PRN;
-    line2.numOfOperands = 1;
-    line2.src = "-5";
-    line2.srcType = IMMEDIATE;
-
-    line3.cmdIDX = SUB;
-    line3.numOfOperands = 2;
-    line3.src = "r1";
-    line3.dest = "r4";
-    line3.srcType = REGISTER;
-    line3.destType = REGISTER;
-
-
-    line4.cmdIDX = ADD;
-    line4.numOfOperands = 2;
-    line4.src = "5";
-    line4.dest = "r2";
-    line4.srcType = IMMEDIATE;
-    line4.destType = REGISTER;
-
-    cmdArr[1] = line1;
-    cmdArr[2] = line2;
-    cmdArr[3] = line3;
-    cmdArr[4] = line4;
-    second_pass(&cmdArr[1], "text");
-
-    return 0;
-}*/
 
 void second_pass(cmdLine cmdLines[], char *fileName)
 {

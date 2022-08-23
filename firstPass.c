@@ -1,12 +1,11 @@
 #include "firstPass.h"
 
 char directives[5][8] = {".data", ".string", ".struct", ".entry", ".extern"};
-boolean ef = false;
+extern boolean ef = false;
 cmdLine cmdArray[40];
-int cmd_cnt = 0;
 dirLine dirArray[40];
-int dir_cnt = 0;
-
+extern int dirCnt;
+extern int cmdCnt;
 
 
 /******MAIN FUNTIONS IN FIRST PASS******/
@@ -188,27 +187,27 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
         ef = true;
     }
     else if(direct_type == STRING){
-		dirArray[dir_cnt].operand_cnt = 0;
+		dirArray[dirCnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
         if(0){/*fix this*/
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
 		else{
-			strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
-			dirArray[dir_cnt].operand_cnt++;
+			strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+			dirArray[dirCnt].operand_cnt++;
 		}
     }
     else if(direct_type == DATA){
-		dirArray[dir_cnt].operand_cnt = 0;
+		dirArray[dirCnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
         while(token){
             if(!is_number(token)){
                 printf("%d: argument is not a number!\n", lineNumber);
                 ef = true;
             }
-			strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
-			dirArray[dir_cnt].operand_cnt++;
+			strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+			dirArray[dirCnt].operand_cnt++;
             token = strtok(NULL, " ,\t\n");
 			
         }
@@ -219,15 +218,15 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: argument is not a number!\n", lineNumber);
             ef = true;
         }
-		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
-		dirArray[dir_cnt].operand_cnt++;
+		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+		dirArray[dirCnt].operand_cnt++;
         token = strtok(NULL, " ,\t\n");
         if(token[0] != '"' || token[strlen(token)-1] != '"'){
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
-		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
-		dirArray[dir_cnt].operand_cnt++;
+		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+		dirArray[dirCnt].operand_cnt++;
         /*add more errors po*/
     }
     else if(direct_type == EXTERN){
@@ -244,8 +243,8 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: external argument needs to be a word\n", lineNumber);
             ef = true;
         }
-		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
-		dirArray[dir_cnt].operand_cnt++;
+		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+		dirArray[dirCnt].operand_cnt++;
     }
     /*check for extra text*/
 	/*int dirType;
@@ -255,9 +254,9 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
 
     if (ef == true) return false;
     else{
-      	dirArray[dir_cnt].dirType = direct_type;
-		dirArray[dir_cnt].lineNum = lineNumber;
-		dir_cnt++;
+      	dirArray[dirCnt].dirType = direct_type;
+		dirArray[dirCnt].lineNum = lineNumber;
+		dirCnt++;
         return true;
     }
 }
@@ -356,14 +355,14 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     int lineNum;*/
     if (ef == true) return false;
     else{
-        cmdArray[cmd_cnt].cmdIDX = getOperandNum(command);
-        strcpy(cmdArray[cmd_cnt].src, src_des[0]);/**/
-        cmdArray[cmd_cnt].srcType = args[0];
-        strcpy(cmdArray[cmd_cnt].dest, src_des[1]); 
-        cmdArray[cmd_cnt].destType = args[1]; 
-        cmdArray[cmd_cnt].numOfOperands = operand_num;
-        cmdArray[cmd_cnt].lineNum = lineNumber;
-        cmd_cnt++;
+        cmdArray[cmdCnt].cmdIDX = getOperandNum(command);
+        strcpy(cmdArray[cmdCnt].src, src_des[0]);/**/
+        cmdArray[cmdCnt].srcType = args[0];
+        strcpy(cmdArray[cmdCnt].dest, src_des[1]); 
+        cmdArray[cmdCnt].destType = args[1]; 
+        cmdArray[cmdCnt].numOfOperands = operand_num;
+        cmdArray[cmdCnt].lineNum = lineNumber;
+        cmdCnt++;
         *arg1 = args[0];
         *arg2 = args[1];
         return true;
@@ -491,7 +490,7 @@ int is_alpha_word(char *word){
 
 void print_cmdArray(){
     int i;
-    for(i = 0; i < cmd_cnt; i++){
+    for(i = 0; i < cmdCnt; i++){
         print_cmd_line(cmdArray[i]);
     }
 }
@@ -505,7 +504,7 @@ void print_cmd_line(cmdLine line){
 
 void print_dirArray(){
 	int i;
-	for(i = 0; i < dir_cnt; i++){
+	for(i = 0; i < dirCnt; i++){
 		print_dir_line(dirArray[i]);
 	}
 }
