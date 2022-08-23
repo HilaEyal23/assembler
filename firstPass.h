@@ -8,7 +8,7 @@
 /*#include "extern_vars.h"*/
 
 /******MAIN FUNTIONS IN FIRST PASS******/
-void first_pass(FILE *fp, char *fileName);
+void first_pass(FILE *fp, char *fileName, symbolNode **head);
 void get_command(char *p, char command[]);
 int get_operand_type(char *op);
 int get_direct_type(char *token, int lineNumber);

@@ -1,18 +1,18 @@
 #include "globals.h"
 #include "utils.h"
-/*#include "symbolList.h"*/
+#include "symbolList.h"
 #include "externVars.h"
 
 extern int cmdCnt;
 extern int ic, dc;
 word cmdWordArr[2560];
 
-void second_pass(cmdLine cmdLines[], char *fileName);
-int code_cmd_line(cmdLine *cmdPtr, int idx);
-int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, int lineNum);
+void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head);
+int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head);
+int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum);
 int code_immediate(int idx, char *operand, int operandNum, int currOffset);
-/*int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int *flag, int *EXT_VAR, int currOffset);
-int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int *EXT_VAR, int *flag, int currOffset, int lineNum);*/
+int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
+int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
 int code_two_registers(int idx, char *src, char *dest, int currOffset);
 int code_register(int idx, char *operand, int operandNum, int currOffset);
 
@@ -23,7 +23,7 @@ void create_extern_file(FILE *file);
 FILE *open_file(char *filename, int type);
 
 
-void second_pass(cmdLine cmdLines[], char *fileName)
+void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
 {
     cmdLine *cmdPtr = &cmdLines[0];
     int i;
@@ -39,7 +39,7 @@ void second_pass(cmdLine cmdLines[], char *fileName)
     for(i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
         printf("\nopcode: %d\n", cmdPtr->cmdIDX);
         printf("numOfOperands: %d\n", cmdPtr->numOfOperands);
-        code_cmd_line(cmdPtr, idx);
+        code_cmd_line(cmdPtr, idx, head);
         ic++;
         /*idx++;*/
         cmdPtr++;
@@ -50,7 +50,7 @@ void second_pass(cmdLine cmdLines[], char *fileName)
 
 
 
-int code_cmd_line(cmdLine *cmdPtr, int idx){
+int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
     int offset = 1;
     cmdWordArr[idx].bits = 0;
     cmdWordArr[idx].bits += cmdPtr->cmdIDX; /*encodes the opcode to the first word of the line*/
@@ -60,15 +60,15 @@ int code_cmd_line(cmdLine *cmdPtr, int idx){
         case 0:
             return idx + offset;
         case 1:
-            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, head, cmdPtr->lineNum);
             return idx + offset;
         case 2:
             if(cmdPtr->srcType == FOURTH_ADDRESS && cmdPtr->destType == FOURTH_ADDRESS){
                 offset += code_two_registers(idx, cmdPtr->src, cmdPtr->dest, offset);
                 return idx + offset;
             }
-            offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, cmdPtr->lineNum);
-            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, head, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, head, cmdPtr->lineNum);
             return idx + offset;
         default:
             printf("default case code_cmd_line()\n");
@@ -78,15 +78,15 @@ int code_cmd_line(cmdLine *cmdPtr, int idx){
 }
 
 
-int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, int lineNum){
-    printf("type: %d\n", type);
+int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum){
+    /*printf("type: %d\n", type);*/
     switch (type) {
         case FIRST_ADDRESS:
             return code_immediate(idx, operand, operandNum, currOffset);
-            /* case SECOND_ADDRESS:
-                 return code_direct(idx, operand, operandNum, currOffset);
+             case SECOND_ADDRESS:
+                 return code_direct(idx, operand, operandNum, head, currOffset, lineNum);
              case THIRD_ADDRESS:
-                 return code_relative(idx, operand, operandNum, currOffset, lineNum);*/
+                 return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
         case FOURTH_ADDRESS:
             return code_register(idx, operand, operandNum, currOffset);
         default:
@@ -102,6 +102,8 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset){
     cmdWordArr[idx].bits << BITS_IN_METHOD;
     if(operandNum == 2)
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+
+    operand++; /*skips '#'*/
 
     if(operand[0] == '-'){
         strcpy(positive, &operand[1]);
@@ -119,17 +121,22 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset){
 
 
 
-/*
+
 int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum){
+    printf("direct\n");
+    printf("<%s>\n", operand);
     symbolNode *ptr = head;
+    printf("%s",ptr->currentNode.name);
     while(ptr){
-        if(!strcmp(ptr->currSymbol.name, operand)){
+        if(!strcmp(ptr->currentNode.name, operand)){
+	    printf("&\n");
             cmdWordArr[idx].bits += DIRECT;
             cmdWordArr[idx].bits << BITS_IN_METHOD;
-            cmdWordArr[currOffset + idx].bits = ptr->currSymbol.value;
-            if(ptr->currSymbol.type == EXTERNAL){
+            cmdWordArr[currOffset + idx].bits = ptr->currentNode.address;
+            cmdWordArr[currOffset + idx].bits << BITS_IN_ADDRESS;
+            if(ptr->currentNode.type == EXTERNAL){
                 extern_exists = true;
-                code_extern_dir(idx);
+                /*code_extern_dir(idx);*/
                 return 1;
             }
             insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
@@ -140,10 +147,11 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     printf("error in line %d: label is not found\n", lineNum);
 
     return 0;
-}*/
-/*to be fixed*/ /*
+}
+
 int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum){
-    cmdWordArr[idx].bits += RELATIVE;
+    printf("relative\n");
+/*cmdWordArr[idx].bits += RELATIVE;
     cmdWordArr[idx].bits << BITS_IN_METHOD;
     char *token;
     char operandCopy[MAX_LINE_LENGTH];
@@ -162,9 +170,9 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
     insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
     currOffset++;
     token = strtok(NULL, " \n");
-    cmdWordArr[currOffset + idx].bits += atoi(token);
+    cmdWordArr[currOffset + idx].bits += atoi(token);*/
     return 2;
-}*/
+}
 
 int code_register(int idx, char *operand, int operandNum, int currOffset){
     int registerIdx;

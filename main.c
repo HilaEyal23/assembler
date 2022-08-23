@@ -3,8 +3,8 @@
 #include "utils.h"
 #include "firstPass.h"
 
-void first_pass(FILE *fp, char *fileName);
-void second_pass(cmdLine cmdLines[], char *fileName);
+void first_pass(FILE *fp, char *fileName, symbolNode **head);
+void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head);
 
 int ic, dc;
 boolean ef;
@@ -35,6 +35,7 @@ int main(int argc, char **argv){
     FILE *fp;
     char fileName[MAX_LINE_LENGTH];
     int i;
+    symbolNode *head;
 
     if(argc == 1){
         printf("no files were given\n");
@@ -48,10 +49,10 @@ int main(int argc, char **argv){
     if(fp != NULL) { 
         printf("************* Started %s assembling process *************\n\n", fileName);
 	reset_global_vars();
-        first_pass(fp, argv[i]);
+        first_pass(fp, argv[i], &head);
 	if (!was_error) { 
                 rewind(fp);
-                second_pass(cmdArray, argv[i]);
+                second_pass(cmdArray, argv[i], &head);
             }
 
         printf("\n\n************* Finished %s assembling process *************\n\n", fileName);

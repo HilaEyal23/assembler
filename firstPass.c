@@ -10,7 +10,7 @@ extern int cmdCnt;
 
 /******MAIN FUNTIONS IN FIRST PASS******/
 
-void first_pass(FILE *fp, char *fileName){
+void first_pass(FILE *fp, char *fileName, symbolNode **head){
     int lineNumber = 1;
     char line[MAX_LINE_LENGTH];
     char linesCopy[MAX_LINE_LENGTH];
@@ -24,7 +24,8 @@ void first_pass(FILE *fp, char *fileName){
     int DC = DC_INIT_VALUE;
 
 
-    symbolNode *head = init_symbol_node(NULL, "999", 0, -1);
+    head = init_symbol_node(NULL, "999", 0, -1);
+    /*symbolNode *head = init_symbol_node(NULL, "999", 0, -1);*/
     while(fgets(line, MAX_LINE_LENGTH, fp)){
         strcpy(linesCopy, line);
         if(!to_be_skipped(line)){
