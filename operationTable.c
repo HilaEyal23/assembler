@@ -7,22 +7,22 @@ static const struct  operationConsts{
     int operandNum;
     int sourceOperand;
     int destinationOperand;
-} operationTable[] = {{"mov",0,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"cmp",1,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"add",2,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"sub",3,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"not",4,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"clr",5,1,0,   SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"lea",6,2,  SECOND_ADDRESS | THIRD_ADDRESS , SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"inc",7,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"dec",8,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"jmp",9,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"bne",10,1,0, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"get",11,1,0, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"prn",12,1,0, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"jsr",13,1,0, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
-                      {"rts",14,0,0,0},
-                      {"hlt",15,0,0,0}};
+} operationTable[] = {{"mov",MOV,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"cmp",CMP,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, FIRST_ADDRESS  | SECOND_ADDRESS| THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"add",ADD,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"sub",SUB,2, FIRST_ADDRESS | SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS, SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"not",NOT,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"clr",CLR,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"lea",LEA,2,    SECOND_ADDRESS | THIRD_ADDRESS , SECOND_ADDRESS| THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"inc",INC,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"dec",DEC,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"jmp",JMP,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"bne",BNE,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"get",GET,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"prn",PRN,1,0,  FIRST_ADDRESS  |SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"jsr",JSR,1,0,  SECOND_ADDRESS | THIRD_ADDRESS | FOURTH_ADDRESS},
+                      {"rts",RTS,0,0,0},
+                      {"hlt",HLT,0,0,0}};
 
 
 
@@ -36,11 +36,11 @@ int isOperationName(char *name) {
 
 
         if (strcmp(name,operationTable[i].name) == 0) {
-            return  1;
+            return  true;
         }
         i++;
     }
-    return  0;
+    return  false;
 
 }
 

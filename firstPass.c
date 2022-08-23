@@ -1,59 +1,28 @@
 #include "firstPass.h"
 
 char directives[5][8] = {".data", ".string", ".struct", ".entry", ".extern"};
-int ef = 0;
+boolean ef = false;
 cmdLine cmdArray[40];
 int cmd_cnt = 0;
 dirLine dirArray[40];
 int dir_cnt = 0;
 
-cmd ourCmd[] = {
-        {"mov", MOV, 2},
-        {"cmp", CMP, 2},
-        {"add", ADD, 2},
-        {"sub", SUB, 2},
-        {"lea", LEA, 2},
 
-        {"not", NOT, 1},
-        {"clr", CLR, 1},
-        {"inc", INC, 1},
-        {"dec", DEC, 1},
-        {"jmp", JMP, 1},
-        {"bne", BNE, 1},
-        {"get", GET, 1},
-        {"prn", PRN, 1},
-        {"jsr", JSR, 1},
 
-        {"rts", RTS, 0},
-        {"hlt", HLT, 0},
-};
-
-Register ourRegisters[] = {
-        {"r0", 0},
-        {"r1", 1},
-        {"r2", 2},
-        {"r3", 3},
-        {"r4", 4},
-        {"r5", 5},
-        {"r6", 6},
-        {"r7", 7}
-};
-
+/******MAIN FUNTIONS IN FIRST PASS******/
 
 void first_pass(FILE *fp, char *fileName){
     int lineNumber = 1;
     char line[MAX_LINE_LENGTH];
     char linesCopy[MAX_LINE_LENGTH];
     char label[MAX_NAME_LENGTH];
-    /*char command[MAX_NAME_LENGTH];*/
     char *token;
-    int labelFlag = 0;
-    int directFlag = 0;
-
+    int labelFlag = false;
+    int directFlag = false;
     int directType;
     int args[2];
-    int IC = 101;
-    int DC = 1;
+    int IC = IC_INIT_VALUE;
+    int DC = DC_INIT_VALUE;
 
 
     symbolNode *head = init_symbol_node(NULL, "999", 0, -1);
@@ -63,18 +32,17 @@ void first_pass(FILE *fp, char *fileName){
             validate_input_form(line, lineNumber);
             token = strtok(line, " \t\n");
             if(is_label(token, lineNumber)){
-                /*strcpy(label, token);*/
                 copy_label_name(label, token);
                 if(symbol_exists(head ,label)){
                     printf("label is already defined!\n");
                 }
-                else{
-                    labelFlag = 1;
-                }
+                
+                labelFlag = true;
+                
+		token = strtok(NULL, " \t\n");
             }
-            token = strtok(NULL, " \t\n");
             if(is_direct(token, lineNumber)){
-                directFlag = 1;
+                directFlag = true;
                 if(validate_direct_form(linesCopy, labelFlag, lineNumber)){/*create this function*/
                     directType = get_direct_type(token, lineNumber);
                 }
@@ -83,28 +51,100 @@ void first_pass(FILE *fp, char *fileName){
                 insert_symbol(head, label, DC, directType);
                 DC++;
             }/*if it is not direct then it is code*/
-            else if(validate_instruction_form(linesCopy, labelFlag, lineNumber, &args[0], &args[1])){
+            else if(!directFlag && validate_instruction_form(linesCopy, labelFlag, lineNumber, &args[0], &args[1])){
                 if(labelFlag){
                     insert_symbol(head, label, IC, CODE);
                     IC += find_L(args[0], args[1])+1;
                 }
             }
         }
-        labelFlag = 0;
-        directFlag = 0;
+        labelFlag = false;
+        directFlag = false;
         lineNumber++;
         /*print_symbol_list(head);*/
     }
-    print_symbol_list(head);
-    print_cmdArray();
+    /*print_symbol_list(head);*/
+    /*print_cmdArray();*/
+	/*print_dirArray();*/
 }
 
+
+int find_L(int address1, int address2){
+    int L = 0;
+    if(address1 == FOURTH_ADDRESS && address2 == FOURTH_ADDRESS){
+        return 1;
+    }
+
+    if(address1 == SECOND_ADDRESS) L++;
+    else if(address1 == FIRST_ADDRESS) L++;
+    else if(address1 == FOURTH_ADDRESS) L++;
+    else if(address1 == THIRD_ADDRESS) L+=2;
+
+    if(address2 == SECOND_ADDRESS) L++;
+    else if(address2 == FIRST_ADDRESS) L++;
+    else if(address2 == FOURTH_ADDRESS) L++;
+    else if(address2 == THIRD_ADDRESS) L+=2;
+
+    return L;
+}
+
+
+int get_operand_type(char *op){
+    int i = 0;
+    if (op[0] == '#'){
+        if(is_number(op+1)){
+            return FIRST_ADDRESS;
+        }
+    }
+    else if(op[0] == 'r'){
+        if(op[1] <= '8' && op[1] >= '1') return FOURTH_ADDRESS;
+    }
+    while(op[i]){
+        if(op[i] == '.'){
+            if(isdigit(op[i+1])){
+                return THIRD_ADDRESS;
+            }
+        }
+        i++;
+    }
+
+    if(is_alpha_word(op)) return SECOND_ADDRESS;
+    
+    return -1;
+
+}
+
+
+int get_direct_type(char *token, int lineNumber){
+    int i;
+    for(i=0; i < 5; i++){
+        if(!strcmp(directives[i], token)) return i;
+    }
+    return NONE;
+}
+
+void get_command(char *p, char command[]){
+    int j,i;
+    for(i = j = 0; p[i]!= EOF && p[i] != '\n' && p[i] != ' ' && p[i] != '\t'; i++){
+        command[j] = p[i];
+        j++;
+    }
+    command[j] = LAST_CHAR;
+}
+
+
+
+/******VALIDATION FUNCTIONS******/
+
+int validate_command(char *token, int lineNumber){
+    return true;
+}
 
 int validate_input_form(char *line, int lineNumber){/*fix this function!!!*/
     char input[MAX_LINE_LENGTH];
     char *token;
-    int comma_cnt = 0;
-    int tokens_cnt = 0;
+    /*int comma_cnt = 0;*/
+    /*int tokens_cnt = 0;*/
     char *p = input;
     strcpy(input, line);
     skip_label(&p); /*skiping the label is there is one :)*/
@@ -127,10 +167,10 @@ int validate_input_form(char *line, int lineNumber){/*fix this function!!!*/
 
 
 int validate_direct_form(char *line, int labelFlag, int lineNumber){
+
     char input[MAX_NAME_LENGTH];
     char *token;
     int direct_type;
-
     strcpy(input, line);
     token = strtok(input, " ,\t\n");
     if(labelFlag){
@@ -143,26 +183,34 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
         return false;
     }
     direct_type = get_direct_type(token, lineNumber);
-    printf("%d\n", direct_type);
     if(direct_type == NONE){
         printf("%d: undefined command name!\n", lineNumber);
         ef = true;
     }
     else if(direct_type == STRING){
+		dirArray[dir_cnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
-        if(token[0] != '"' || token[strlen(token)-1] != '"'){
+        if(0){/*fix this*/
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
+		else{
+			strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
+			dirArray[dir_cnt].operand_cnt++;
+		}
     }
     else if(direct_type == DATA){
+		dirArray[dir_cnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
         while(token){
             if(!is_number(token)){
                 printf("%d: argument is not a number!\n", lineNumber);
                 ef = true;
             }
+			strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
+			dirArray[dir_cnt].operand_cnt++;
             token = strtok(NULL, " ,\t\n");
+			
         }
     }
     else if(direct_type == STRUCT){
@@ -171,11 +219,15 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: argument is not a number!\n", lineNumber);
             ef = true;
         }
+		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
+		dirArray[dir_cnt].operand_cnt++;
         token = strtok(NULL, " ,\t\n");
         if(token[0] != '"' || token[strlen(token)-1] != '"'){
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
+		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
+		dirArray[dir_cnt].operand_cnt++;
         /*add more errors po*/
     }
     else if(direct_type == EXTERN){
@@ -192,11 +244,22 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: external argument needs to be a word\n", lineNumber);
             ef = true;
         }
+		strcpy(dirArray[dir_cnt].operands[dirArray[dir_cnt].operand_cnt], token);
+		dirArray[dir_cnt].operand_cnt++;
     }
     /*check for extra text*/
+	/*int dirType;
+    char *operand;
+    int lineNum;*/
+	
 
     if (ef == true) return false;
-    return true;
+    else{
+      	dirArray[dir_cnt].dirType = direct_type;
+		dirArray[dir_cnt].lineNum = lineNumber;
+		dir_cnt++;
+        return true;
+    }
 }
 
 
@@ -208,7 +271,6 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     int args[2];
     int operand_num;
     int ef = 0;
-    int arg;
     int i;
 
     strcpy(input, line);
@@ -232,20 +294,37 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     strcpy(command, token);
     if(ef == false){
         operand_num = getOperandNum(command);
-        for(i = 0; i < operand_num; i++){
+        
+    if(ef == false){
+        operand_num = getOperandNum(command);
+
+        if(operand_num == 1){
+            token = strtok(NULL, " ,\t\n");
+            if(token == NULL){
+                printf("%d: missing argument!\n", lineNumber);
+                ef = true;
+            }
+            args[1] = get_operand_type(token);
+            if(args[1] == -1) printf("%d: not vaild argument!\n", lineNumber);
+            if((getDestinationOperand(command) & args[1]) == 0){
+                printf("%d: not vaild argument!\n", lineNumber);
+                ef = true;
+            }
+            strcpy(src_des[1], token);
+        }
+        else if(operand_num == 2){
+            for(i = 0; i < operand_num; i++){
             token = strtok(NULL, " ,\t\n");
             if(token == NULL){
                 printf("%d: missing argument!\n", lineNumber);
                 ef = true;
                 break;
             }
-            puts(token);
             args[i] = get_operand_type(token);
-            printf("%d\n", args[i]);
-
             if(args[i] == -1) printf("%d: not vaild argument!\n", lineNumber);
             if(i == 0){
                 if((getSourceOperand(command) & args[i]) == 0){
+                    printf("%d\n", getSourceOperand(command));
                     printf("%d: not vaild argument!\n", lineNumber);
                     ef = true;
                 }
@@ -258,6 +337,8 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
             }
             strcpy(src_des[i], token);
         }
+        }
+    }
 
         token = strtok(NULL, " \t\n");
         if(token != NULL){
@@ -275,7 +356,7 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     int lineNum;*/
     if (ef == true) return false;
     else{
-        cmdArray[cmd_cnt].cmdIDX = get_cmd_IDX(command);
+        cmdArray[cmd_cnt].cmdIDX = getOperandNum(command);
         strcpy(cmdArray[cmd_cnt].src, src_des[0]);/**/
         cmdArray[cmd_cnt].srcType = args[0];
         strcpy(cmdArray[cmd_cnt].dest, src_des[1]); 
@@ -289,113 +370,23 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     }
 }
 
-void print_cmd_line(cmdLine line){
-    printf("-----------\n");
-    printf(" cmdIDX = %d\n cmdSrc = %s\n cmdSrcType = %d\n cmdDest = %s\n cmdDestType = %d\n numOfOperands = %d\n lineNumber = %d\n"
-            , line.cmdIDX, line.src, line.srcType, line.dest, line.destType, line.numOfOperands, line.lineNum);
-    printf("-----------\n");
+
+
+/******PARSING FUNCTIONS******/
+
+void skip_command(char **p){
+    skip_spaces(p);
+    skip_token(p);
+    skip_spaces(p);
 }
 
-int find_L(int address1, int address2){
-    int L = 0;
-    if(address1 == FOURTH_ADDRESS && address2 == FOURTH_ADDRESS){
+int check_comma(char c){
+    if(c == ','){
         return 1;
     }
-
-    if(address1 == SECOND_ADDRESS) L++;
-    else if(address1 == FIRST_ADDRESS) L++;
-    else if(address1 == FOURTH_ADDRESS) L++;
-    else if(address1 == THIRD_ADDRESS) L+=2;
-
-    if(address2 == SECOND_ADDRESS) L++;
-    else if(address2 == FIRST_ADDRESS) L++;
-    else if(address2 == FOURTH_ADDRESS) L++;
-    else if(address2 == THIRD_ADDRESS) L+=2;
-
-    return L;
+    return 0;
 }
 
-
-/*
-first = miyadi #5
-second = yashir x:
-third = reshima .struct
-fourth = register r1-r8
-*/
-int get_operand_type(char *op){
-    int i = 1;
-    if (op[0] == '#') return FIRST_ADDRESS;
-    if(op[0] == 'r'){
-        if(op[1] <= '8' && op[1] >= '1') return FOURTH_ADDRESS;
-    }
-    while(op[i]){
-        if(op[i] == '.'){
-            if(!isdigit(op[i+1])) return ERROR;
-            else return THIRD_ADDRESS;
-        }
-        i++;
-    }
-    return SECOND_ADDRESS;
-
-}
-
-int validate_command(char *token, int lineNumber){
-    return true;
-}
-
-int is_direct(char *token, int lineNumber){
-    if(token == NULL) return false;
-    if(token[0] == '.') return true;
-    return false;
-}
-
-int get_direct_type(char *token, int lineNumber){
-    int i;
-    for(i=0; i < 5; i++){
-        if(!strcmp(directives[i], token)) return i;
-    }
-    return NONE;
-}
-
-
-int is_label(char *token, int lineNumber){
-    int len = strlen(token);
-    int i;
-
-    if(!token)
-        return false;
-    if(token[len-1] != ':')
-        return false;
-
-    for(i = 0; i < len-1; i++){
-        if(isdigit(token[i])){
-            puts("error");
-            return false;
-        }
-    }
-    return true;
-}
-
-
-
-
-/******utils******/
-
-
-void copy_label_name(char *label, char *token){
-    int size;
-    strcpy(label, token);
-    size = strlen(label);
-    label[size-1] = LAST_CHAR;
-}
-
-int to_be_skipped(char line[]){
-    int i = 0;
-    i = skip_empty(line, i);
-    if(line[i] == LAST_CHAR || line[i] == ';' || line[i] == '\n')
-        return true;
-    return false;
-}
 
 int skip_empty(char *line, int i){
     for(; i < strlen(line); i++)
@@ -430,6 +421,59 @@ void skip_label(char **line){
     }
 }
 
+int to_be_skipped(char line[]){
+    int i = 0;
+    i = skip_empty(line, i);
+    if(line[i] == LAST_CHAR || line[i] == ';' || line[i] == '\n')
+        return true;
+    return false;
+}
+
+void copy_label_name(char *label, char *token){
+    int size;
+    strcpy(label, token);
+    size = strlen(label);
+    label[size-1] = LAST_CHAR;
+}
+
+
+
+/******DETECTING FUNCTIONS******/
+
+int is_label(char *token, int lineNumber){
+    int len = strlen(token);
+    int i;
+
+    if(!token)
+        return false;
+    if(token[len-1] != ':')
+        return false;
+
+    for(i = 0; i < len-1; i++){
+        if(isdigit(token[i])){
+            printf("%d: unvaild label name\n", lineNumber);
+            break;
+        }
+    }
+    return true;
+}
+
+int is_direct(char *token, int lineNumber){
+    if(token == NULL) return false;
+    if(token[0] == '.') return true;
+    return false;
+}
+
+int is_number(char *num){
+    int length, i;
+    if(num == NULL) return false;
+    length = strlen(num);
+    for(i=0; i < length-1; i++){
+        if(!isdigit(num[i])) return false;
+    }
+    return true;
+}
+
 int is_alpha_word(char *word){
     int length, i;
     if(word == NULL) return false;
@@ -441,25 +485,9 @@ int is_alpha_word(char *word){
     return true;
 }
 
-int is_number(char *num){
-    int length, i;
-    if(num == NULL) return false;
-    length = strlen(num);
-    for(i=0; i < length; i++){
-        if(!isdigit(num[i])) return false;
-    }
-    return true;
-}
 
-int get_cmd_IDX(char str[]){
-    int i;
-    for(i=0; i<CMD_AMOUNT; i++){
-        if(!strcmp(str,ourCmd[i].name)){
-            return ourCmd[i].cmdCode;
-        }
-    }
-    return NOT_FOUND;
-}
+
+/******DEBUG TOOLS******/
 
 void print_cmdArray(){
     int i;
@@ -468,24 +496,27 @@ void print_cmdArray(){
     }
 }
 
-int check_comma(char c){
-    if(c == ','){
-        return 1;
-    }
-    return 0;
+void print_cmd_line(cmdLine line){
+    printf("-----------\n");
+    printf(" cmdIDX = %d\n cmdSrc = %s\n cmdSrcType = %d\n cmdDest = %s\n cmdDestType = %d\n numOfOperands = %d\n lineNumber = %d\n"
+            , line.cmdIDX, line.src, line.srcType, line.dest, line.destType, line.numOfOperands, line.lineNum);
+    printf("-----------\n");
 }
 
-void skip_command(char **p){
-    skip_spaces(p);
-    skip_token(p);
-    skip_spaces(p);
+void print_dirArray(){
+	int i;
+	for(i = 0; i < dir_cnt; i++){
+		print_dir_line(dirArray[i]);
+	}
 }
 
-void get_command(char *p, char command[]){
-    int j,i;
-    for(i = j = 0; p[i]!= EOF && p[i] != '\n' && p[i] != ' ' && p[i] != '\t'; i++){
-        command[j] = p[i];
-        j++;
-    }
-    command[j] = LAST_CHAR;
+void print_dir_line(dirLine line){
+	int i;
+    printf("-----------\n");
+    printf("type = %d\n line = %d\n",
+            line.dirType, line.lineNum);
+	for(i = 0; i < line.operand_cnt; i++){
+		printf("opernad %d = %s\n", i, line.operands[i]);
+	}
+    printf("-----------\n");
 }

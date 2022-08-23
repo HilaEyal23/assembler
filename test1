@@ -1,0 +1,10 @@
+mov r1, r2
+mov r3
+.data 5,6,7,8
+prn HIMY
+mov HI,r3
+hlt 0
+mov r3,r3
+mov r3,#5
+.string "ilai
+.struct 5,"ilai"

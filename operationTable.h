@@ -3,13 +3,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include "globals.h"
 
-#define NUM_OF_OPERATIONS 16
-
-#define FIRST_ADDRESS 1
-#define SECOND_ADDRESS 2
-#define THIRD_ADDRESS 3
-#define FOURTH_ADDRESS 4
 
 /*
 This function is checking if the received name of the operationTable is valid or not.

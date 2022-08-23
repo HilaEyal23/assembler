@@ -9,7 +9,6 @@
 
 /******MAIN FUNTIONS IN FIRST PASS******/
 void first_pass(FILE *fp, char *fileName);
-int get_cmd_IDX(char str[]);
 void get_command(char *p, char command[]);
 int get_operand_type(char *op);
 int get_direct_type(char *token, int lineNumber);
@@ -40,6 +39,8 @@ int is_alpha_word(char *word);
 /******DEBUG TOOLS******/
 void print_cmdArray();
 void print_cmd_line(cmdLine line);
+void print_dirArray();
+void print_dir_line(dirLine line);
 
 
 #endif /*_FIRSTPASS_H*/

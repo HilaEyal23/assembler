@@ -22,31 +22,10 @@ typedef struct cmdLine{
 
 typedef struct dirLine{
     int dirType;
-    char *operand;
+    char operands[20][MAX_NAME_LENGTH];
+	int operand_cnt;
     int lineNum;
 }dirLine;
-
-typedef struct cmd{
-    char name[CMD_LENGTH];
-    int cmdCode;
-    int numOfOperands;
-}cmd;
-
-/**/
-
-typedef struct Register{
-    char *name;
-    int num;
-}Register;
-
-
-/*
-const char base32[32] = {
-        '!', '@', '#', '$', '%', '^', '&', '*',
-        '<','>', 'a', 'b', 'c','d', 'e', 'f',
-        'g','h', 'i', 'j', 'k', 'l', 'm', 'n',
-        'o', 'p','q', 'r', 's', 't', 'u', 'v'
-};*/
 
 
 #endif /*_STRUCTS_H*/

@@ -8,6 +8,7 @@
 
 
 #define IC_INIT_VALUE 100
+#define DC_INIT_VALUE 0
 #define EMPTY_WORD 0
 #define EXTERNAL_DEFAULT_ADDRESS 0
 #define NO_ERRORS 0
@@ -28,10 +29,16 @@
 #define OPERAND_TYPES_AMOUNT 5
 #define MAX_NUM_OF_OPERANDS 2
 #define REGISTER_AMOUNT 8
-#define CMD_AMOUNT 16
+#define CMD_AMOUNT 16 /*same as below*/
+#define NUM_OF_OPERATIONS 16
 #define ADDRESSING_METHOD_AMOUNT 6
 #define INSTRUCTION_AMOUNT 5
 #define ERRORS_AMOUNT 37
+
+#define FIRST_ADDRESS 1    /*0001*/
+#define SECOND_ADDRESS 2   /*0010*/
+#define THIRD_ADDRESS 4    /*0100*/
+#define FOURTH_ADDRESS 8   /*1000*/
 
 #define BITS_IN_WORD 10
 #define BITS_IN_OPCODE 4
@@ -40,7 +47,7 @@
 #define BITS_IN_REGISTER 4
 #define BITS_IN_ADDRESS 8
 
-#define MACHINE_RAM 2560 /*to be checked*/
+#define MACHINE_RAM 2560 
 
 typedef enum boolean{false, true} boolean;
 typedef enum flag{off, on} flag;
@@ -57,7 +64,9 @@ typedef enum cmdIdx{NOT_FOUND_OP = -1, MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, D
 enum dirType{NONE = -1,DATA, STRING, STRUCT, ENTRY, EXTERN, CODE};
 enum ARE {ABSOLUTE, EXTERNAL, RELOCATABLE};
 enum filetypes {FILE_INPUT, FILE_OBJECT, FILE_ENTRY, FILE_EXTERN};
-/*enum operands{IMMEDIATE_OP = 0, DIRECT_OP, STRUCT_OP, REGISTER_OP};*/
-/*enum {NO_COLON, COLON};*/
+
+
+
+
 
 #endif /*_GLOBALS_H*/
