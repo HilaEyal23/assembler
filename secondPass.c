@@ -71,26 +71,32 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
 
     cmdWordArr[idx].bits = cmdPtr->cmdIDX; /*encodes the opcode to the first word of the line*/
 
-    /*cmdWordArr[idx].bits = cmdWordArr->bits << BITS_IN_OPCODE;*/
+    cmdWordArr[idx].bits <<= BITS_IN_OPCODE;
 
 
-    printf("cmdIdx: %d\n",  cmdPtr->cmdIDX);
+    /*printf("cmdIdx: %d\n",  cmdPtr->cmdIDX);
     printf("opcode binary:");
     print_binary(cmdPtr->cmdIDX);
     printf("\n");   
     printf("print binary:");
     print_binary(cmdWordArr[idx].bits);
-    printf("\n");
+    printf("\n");*/
 
     switch (cmdPtr->numOfOperands) {
 
         case 0:
+		printf("print binary:");
+		print_binary(cmdWordArr[idx].bits);
+		printf("\n");
 
             return idx + offset;
 
         case 1:
 
             offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, head, cmdPtr->lineNum);
+		printf("print binary:");
+		print_binary(cmdWordArr[idx].bits);
+		printf("\n");
 
             return idx + offset;
 
@@ -99,6 +105,9 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
             if(cmdPtr->srcType == FOURTH_ADDRESS && cmdPtr->destType == FOURTH_ADDRESS){
 
                 offset += code_two_registers(idx, cmdPtr->src, cmdPtr->dest, offset);
+		printf("print binary:");
+		print_binary(cmdWordArr[idx].bits);
+		printf("\n");
 
                 return idx + offset;
 
@@ -107,6 +116,9 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
             offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, head, cmdPtr->lineNum);
 
             offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, head, cmdPtr->lineNum);
+	    printf("print binary:");
+	    print_binary(cmdWordArr[idx].bits);
+	    printf("\n");
 
             return idx + offset;
 
@@ -170,9 +182,13 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset){
 
     
 
-    /*if(operandNum == 2)*/
+    if(operandNum == 2){
+	cmdWordArr[idx].bits >>= (BITS_IN_ARE + BITS_IN_ADDRESS);
+	cmdWordArr[idx].bits += IMMEDIATE;
 
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+
+    }
 
 
 
@@ -316,7 +332,7 @@ int code_register(int idx, char *operand, int operandNum, int currOffset){
 
     cmdWordArr[idx].bits += REGISTER;
 
-    cmdWordArr[idx].bits << BITS_IN_METHOD;
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
 
 
 
@@ -555,13 +571,6 @@ FILE *open_file(char *filename, int type)
     return file;
 
 }
-
-
-
-
-
-
-
 
 
 void print_binary(unsigned int number)
