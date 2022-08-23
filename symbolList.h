@@ -1,43 +1,34 @@
-#ifndef SYMBOLLIST_H
-#define SYMBOLLIST_H
-#include "utils.h"
+#ifndef _SYMBOLLIST_H
+#define _SYMBOLLIST_H
 
-typedef enum symbolType{NO_TYPE = -1, CODE_SYMBOL, DATA_SYMBOL, EXTERNAL_SYMBOL, ENTRY_SYMBOL, REFERENCE_SYMBOL} symbolType;
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <ctype.h>
+
+#include "globals.h"
+
+#define MAX_NAME_LENGTH 31
+#define MAX_LINE_LENGTH 81
 
 typedef struct symbol{
-    char name[MAX_NAME_LENGTH];
-    unsigned int value;
-    unsigned long address;
-    symbolType type;
-    int offset;
+    char *name;
+    int address;
+    int type;
 }symbol;
 
 typedef struct symbolNode{
-    symbol currSymbol;
+    symbol currentNode;
     struct symbolNode *next;
 }symbolNode;
 
-
-symbolNode* init_symbol(char name[], unsigned int value, unsigned long address, int offset, int type); //
-void free_symbol_list(symbolNode *head); //
-void print_symbol_list(symbolNode *head); //
-int symbol_list_length(symbolNode *head); //
-void update_entry(symbolNode *head, char name[]); //
-void insert_symbol(symbolNode **head, symbolNode *newNode);//
-int is_symbol_defined(symbolNode *head, char name[]); //
-symbol* find_symbol(symbolNode *head, char *symbolName);
+symbolNode *init_symbol_node(symbolNode* next, char *name, int address, int type);
+void insert_symbol(symbolNode* head, char *name, int address, int type);
+void print_symbol_list(symbolNode* head);
+int symbol_exists(symbolNode *head, char *name);
+int find_symbol_address(symbolNode *head, char *name);
+int find_symbol_type(symbolNode *head, char *name);
 
 
-/* Functions of symbols table */
-labelPtr add_label(labelPtr *hptr, char *name, unsigned int address, boolean external, ...);
-int delete_label(labelPtr *hptr, char *name);
-void free_labels(labelPtr *hptr);
-void offset_addresses(labelPtr label, int num, boolean is_data);
-unsigned int get_label_address(labelPtr h, char *name);
-labelPtr get_label(labelPtr h, char *name);
-boolean is_existing_label(labelPtr h, char *name);
-boolean is_external_label(labelPtr h, char *name);
-int make_entry(labelPtr h, char *name);
-void print_labels(labelPtr h);
 
-#endif /*SYMBOLLIST_H*/
+#endif /*_SYMBOLLIST_H*/
