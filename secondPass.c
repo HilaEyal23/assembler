@@ -45,7 +45,7 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
         cmdPtr++;
     }
 
-    create_output_files("test");
+    create_output_files(fileName);
 }
 
 
