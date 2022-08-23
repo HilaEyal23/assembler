@@ -29,6 +29,7 @@ void skip_token(char **p);
 int skip_empty(char *line, int i);
 int to_be_skipped(char line[]);
 void copy_label_name(char *label, char *token);
+boolean end_of_line(char *line);
 
 /******DETECTING FUNCTIONS******/
 int is_label(char *token, int lineNumber);

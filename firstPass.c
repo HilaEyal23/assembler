@@ -1,7 +1,7 @@
 #include "firstPass.h"
 
 char directives[5][8] = {".data", ".string", ".struct", ".entry", ".extern"};
-extern boolean ef = false;
+extern boolean ef;
 cmdLine cmdArray[40];
 dirLine dirArray[40];
 extern int dirCnt;
@@ -60,11 +60,11 @@ void first_pass(FILE *fp, char *fileName){
         labelFlag = false;
         directFlag = false;
         lineNumber++;
-        /*print_symbol_list(head);*/
+        print_symbol_list(head);
     }
-    /*print_symbol_list(head);*/
-    /*print_cmdArray();*/
-	/*print_dirArray();*/
+    print_symbol_list(head);
+    print_cmdArray();
+	print_dirArray();
 }
 
 
@@ -355,7 +355,7 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     int lineNum;*/
     if (ef == true) return false;
     else{
-        cmdArray[cmdCnt].cmdIDX = getOperandNum(command);
+        cmdArray[cmdCnt].cmdIDX = getOperationOpcode(command);
         strcpy(cmdArray[cmdCnt].src, src_des[0]);/**/
         cmdArray[cmdCnt].srcType = args[0];
         strcpy(cmdArray[cmdCnt].dest, src_des[1]); 
@@ -435,6 +435,10 @@ void copy_label_name(char *label, char *token){
     label[size-1] = LAST_CHAR;
 }
 
+boolean end_of_line(char *line){
+    return line == NULL || *line == '\0' || *line =='\n';
+}
+
 
 
 /******DETECTING FUNCTIONS******/
@@ -463,7 +467,23 @@ int is_direct(char *token, int lineNumber){
     return false;
 }
 
-int is_number(char *num){
+
+int is_number(char *seq){
+    if(end_of_line(seq)) return false;
+    if(*seq == '+' || *seq == '-'){
+        seq++;
+        if(!isdigit(*seq++))
+            return false;
+    }
+    while(!end_of_line(seq)){
+        if(!isdigit(*seq++))
+            return false;
+    }
+    return true;
+}
+
+
+/*int is_number(char *num){
     int length, i;
     if(num == NULL) return false;
     length = strlen(num);
@@ -471,7 +491,7 @@ int is_number(char *num){
         if(!isdigit(num[i])) return false;
     }
     return true;
-}
+}*/
 
 int is_alpha_word(char *word){
     int length, i;

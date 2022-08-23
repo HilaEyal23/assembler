@@ -60,10 +60,10 @@ int code_cmd_line(cmdLine *cmdPtr, int idx){
         case 0:
             return idx + offset;
         case 1:
-            offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, cmdPtr->lineNum);
             return idx + offset;
         case 2:
-            if(cmdPtr->srcType == REGISTER && cmdPtr->destType == REGISTER){
+            if(cmdPtr->srcType == FOURTH_ADDRESS && cmdPtr->destType == FOURTH_ADDRESS){
                 offset += code_two_registers(idx, cmdPtr->src, cmdPtr->dest, offset);
                 return idx + offset;
             }
@@ -81,13 +81,13 @@ int code_cmd_line(cmdLine *cmdPtr, int idx){
 int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, int lineNum){
     printf("type: %d\n", type);
     switch (type) {
-        case IMMEDIATE:
+        case FIRST_ADDRESS:
             return code_immediate(idx, operand, operandNum, currOffset);
-            /* case DIRECT:
+            /* case SECOND_ADDRESS:
                  return code_direct(idx, operand, operandNum, currOffset);
-             case RELATIVE:
+             case THIRD_ADDRESS:
                  return code_relative(idx, operand, operandNum, currOffset, lineNum);*/
-        case REGISTER:
+        case FOURTH_ADDRESS:
             return code_register(idx, operand, operandNum, currOffset);
         default:
             printf("default case code_cmd_operand()\n");
