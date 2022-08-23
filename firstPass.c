@@ -22,16 +22,16 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
     int args[2];
     int IC = IC_INIT_VALUE;
     int DC = DC_INIT_VALUE;
-
+    int DCL = 0;
 
     *head = init_symbol_node(NULL, "999", 0, -1);
     /*symbolNode *head = init_symbol_node(NULL, "999", 0, -1);*/
     while(fgets(line, MAX_LINE_LENGTH, fp)){
         strcpy(linesCopy, line);
         if(!to_be_skipped(line)){
-            validate_input_form(line, lineNumber);
             token = strtok(line, " \t\n");
             if(is_label(token, lineNumber)){
+                
                 copy_label_name(label, token);
                 if(symbol_exists(*head ,label)){
                     printf("label is already defined!\n");
@@ -39,20 +39,21 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
                 
                 labelFlag = true;
                 
-		token = strtok(NULL, " \t\n");
+		        token = strtok(NULL, " \t\n");
             }
+            /*validate_input_form(line, lineNumber, labelFlag);*/
             if(is_direct(token, lineNumber)){
                 directFlag = true;
-                if(validate_direct_form(linesCopy, labelFlag, lineNumber)){/*create this function*/
+                if(validate_direct_form(linesCopy, labelFlag, lineNumber, &DCL)){/*create this function*/
                     directType = get_direct_type(token, lineNumber);
                 }
             }
-            if(directFlag && labelFlag){
+            if(directFlag && labelFlag && ef == 0){
                 insert_symbol(*head, label, DC, directType);
-                DC++;
+                DC+=DCL;
             }/*if it is not direct then it is code*/
             else if(!directFlag && validate_instruction_form(linesCopy, labelFlag, lineNumber, &args[0], &args[1])){
-                if(labelFlag){
+                if(labelFlag &&  ef == 0){
                     insert_symbol(*head, label, IC, CODE);
                     IC += find_L(args[0], args[1])+1;
                 }
@@ -61,11 +62,19 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
         labelFlag = false;
         directFlag = false;
         lineNumber++;
-        print_symbol_list(*head);
+        DCL = 0;
     }
-    print_symbol_list(*head);
+    add_IC_to_directs(*head, IC);
+    /*print_symbol_list(*head);*/
     print_cmdArray();
 	print_dirArray();
+}
+
+void add_IC_to_directs(symbolNode *head, int IC){
+    while(head){
+        if(head->currentNode.type < 5) head->currentNode.address += IC;
+        head = head->next;
+    }
 }
 
 
@@ -99,7 +108,7 @@ int get_operand_type(char *op){
     else if(op[0] == 'r'){
         if(op[1] <= '8' && op[1] >= '1') return FOURTH_ADDRESS;
     }
-    while(op[i]){
+    while(op[i+1]){
         if(op[i] == '.'){
             if(isdigit(op[i+1])){
                 return THIRD_ADDRESS;
@@ -140,34 +149,52 @@ int validate_command(char *token, int lineNumber){
     return true;
 }
 
-int validate_input_form(char *line, int lineNumber){/*fix this function!!!*/
+/*int validate_input_form(char *line, int lineNumber, int labelFlag){
     char input[MAX_LINE_LENGTH];
     char *token;
-    /*int comma_cnt = 0;*/
-    /*int tokens_cnt = 0;*/
-    char *p = input;
+    int comma_cnt = 0;
+    int tokens_cnt = 0;
+    char prev[2];
     strcpy(input, line);
-    skip_label(&p); /*skiping the label is there is one :)*/
-    token = strtok(p, " \t\n");
-    if(token[0] == ','){ /*unvaild comma check ar start/after label*/
-        printf("%d: illegal comma\n", lineNumber);
-        ef = true;
-    }
-    /*while(token != NULL && token[0] != '\n'){
-        token = strtok(NULL, " \t\n");
-        if(token[0] != ','){
-            printf("%d: missing comma\n", lineNumber);
-            ef = 1;
+    if(labelFlag){
+        token = strtok(input, " \t\n");
+        if(token == NULL){
+            ef = true;
+            return 0;
         }
-    }*/
+    }
+    token = strtok(NULL, " \t\n");
+    if(token == NULL){
+        ef = true;
+        return 0;
+    }
+    token = strtok(NULL, " \t\n");
+    while(token != NULL && token[0] != '\n'){
+        if(token[0] == ','){
+            comma_cnt++;
+            if(prev[0] == ','){
+                printf("%d: there is 2 commas after argument!\n", lineNumber);
+            }
+            if(token != NULL) strncpy(prev, token, 1);
+        }
+        else{
+            tokens_cnt++;
+        }
+        token = strtok(NULL, " \t\n");
+    }
+    printf("\ncommas: %d\n args: %d\n\n", comma_cnt, tokens_cnt);
+    if(comma_cnt >= tokens_cnt){
+        ef = true;
+        printf("%d: illegal comma!!\n", lineNumber);
+    }
 
     if(ef == false) return true;
     return false;
-}
+}*/
 
 
-int validate_direct_form(char *line, int labelFlag, int lineNumber){
-
+int validate_direct_form(char *line, int labelFlag, int lineNumber, int *DCL){
+    int D = 0;
     char input[MAX_NAME_LENGTH];
     char *token;
     int direct_type;
@@ -190,6 +217,7 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
     else if(direct_type == STRING){
 		dirArray[dirCnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
+        D = strlen(token)-1;
         if(0){/*fix this*/
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
@@ -203,6 +231,7 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
 		dirArray[dirCnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
         while(token){
+            D++;
             if(!is_number(token)){
                 printf("%d: argument is not a number!\n", lineNumber);
                 ef = true;
@@ -219,6 +248,7 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: argument is not a number!\n", lineNumber);
             ef = true;
         }
+        D++;
 		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 		dirArray[dirCnt].operand_cnt++;
         token = strtok(NULL, " ,\t\n");
@@ -226,6 +256,7 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
+        D+= strlen(token)-1;
 		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 		dirArray[dirCnt].operand_cnt++;
         /*add more errors po*/
@@ -239,20 +270,42 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber){
         if(token == NULL){
             printf("%d: missing label argument\n", lineNumber);
             ef = true;
+            return false;
         }
         else if(!is_alpha_word(token)){
-            printf("%d: external argument needs to be a word\n", lineNumber);
+            printf("%d: external argument needs to be a label name!\n", lineNumber);
             ef = true;
         }
 		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 		dirArray[dirCnt].operand_cnt++;
+        D++;
     }
-    /*check for extra text*/
-	/*int dirType;
-    char *operand;
-    int lineNum;*/
-	
-
+  
+    else if(direct_type == ENTRY){
+           if(labelFlag){
+            printf("%d: label can not contain entry instruction\n", lineNumber);
+            ef = true;
+        }
+        token = strtok(NULL, " ,\t\n");
+        if(token == NULL){
+            printf("%d: missing label argument\n", lineNumber);
+            ef = true;
+            return false;
+        }
+        else if(!is_alpha_word(token)){
+            printf("%d: entry's argument needs to be a label name!\n", lineNumber);
+            ef = true;
+        }
+		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
+		dirArray[dirCnt].operand_cnt++;
+        D++;
+    }
+	  token = strtok(NULL, " ,\t\n");
+     if(token != NULL){
+        printf("%d: extra text after command!\n", lineNumber);
+        ef = true;
+    }
+    *DCL = D;
     if (ef == true) return false;
     else{
       	dirArray[dirCnt].dirType = direct_type;
@@ -347,13 +400,6 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
         }
 
     }
-    /*int cmdIDX;
-    char *src;
-    int srcType;
-    char *dest;
-    int destType;
-    int numOfOperands;
-    int lineNum;*/
     if (ef == true) return false;
     else{
         cmdArray[cmdCnt].cmdIDX = getOperationOpcode(command);
@@ -445,20 +491,51 @@ boolean end_of_line(char *line){
 /******DETECTING FUNCTIONS******/
 
 int is_label(char *token, int lineNumber){
-    int len = strlen(token);
+
     int i;
 
-    if(!token)
-        return false;
-    if(token[len-1] != ':')
-        return false;
+    
+    if(token[strlen(token)-1] != ':') return false;
+    /*firstly we have to check if the first letter is a digit, this is unvaild*/
+    if (!isalpha(token[0])){
+        printf("%d: label can not start with digit!\n", lineNumber);
+        return true;
+    }
+        
+    for (i = 1; i < strlen(token) - 1; i++) /*after that we check if it is a unvaild symbol line * */
+    {
+        if (!isalpha(token[i]) && !isdigit(token[i]))
+            return true;
+    }
 
-    for(i = 0; i < len-1; i++){
-        if(isdigit(token[i])){
-            printf("%d: unvaild label name\n", lineNumber);
-            break;
+    /* Loop over each command, and check if it's name is equal to a known command */
+    
+
+    /* check for directives*/
+    for(i = 0; i < 5; i++){
+        if(!strcmp(directives[i], token)){
+            printf("%d: label can't be a directive!\n", lineNumber);
         }
     }
+
+    /* check if it's a register name */
+    /*if (token[0] == 'r')
+    {
+        int j = 0;
+        char number[MAX_LEN] = {0};
+
+        i = 1;
+
+        while ((isdigit(name[i]) || name[i] == '-' || name[i] == '+') && name[i] != ',')
+            number[j++] = name[i++];
+
+        register_number = atoi(number);
+        if (register_number >= 0 && register_number <= 15)
+        {
+            return false;
+        }
+    }*/
+
     return true;
 }
 

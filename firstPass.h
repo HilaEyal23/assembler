@@ -13,11 +13,12 @@ void get_command(char *p, char command[]);
 int get_operand_type(char *op);
 int get_direct_type(char *token, int lineNumber);
 int find_L(int address1, int address2);
+void add_IC_to_directs(symbolNode *head, int IC);
 
 /******VALIDATION FUNCTIONS******/
 int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *arg1, int *arg2);
-int validate_direct_form(char *line, int labelFlag, int lineNumber);
-int validate_input_form(char *line, int min_args);
+int validate_direct_form(char *line, int labelFlag, int lineNumber, int *DCL);
+int validate_input_form(char *line, int min_args, int labelFlag);
 int validate_command(char *token, int lineNumber);
 
 /******PARSING FUNCTIONS******/

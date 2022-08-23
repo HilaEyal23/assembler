@@ -1,10 +1,14 @@
+.extern ilai
+boolbool: .string "ilai"
+plutz: .struct 8, "ilai"
+flumin: .data 1,2,3
 mov r1, r2
-mov r3
+mai5n: mov r3, ilai
 .data 5,6,7,8
 prn HIMY
 mov HI,r3
-hlt 0
-mov r3,r3
-mov r3,#5
+hlt 
+shlomo: mov S.4,S.2
+itzhak: mov r3,ilai
 .string "ilai
 .struct 5,"ilai"
