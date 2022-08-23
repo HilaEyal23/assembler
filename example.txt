@@ -1,0 +1,5 @@
+
+macro m1
+Hi my name is ilai
+endmacro
+m1
