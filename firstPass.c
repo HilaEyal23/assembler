@@ -24,7 +24,7 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
     int DC = DC_INIT_VALUE;
 
 
-    head = init_symbol_node(NULL, "999", 0, -1);
+    *head = init_symbol_node(NULL, "999", 0, -1);
     /*symbolNode *head = init_symbol_node(NULL, "999", 0, -1);*/
     while(fgets(line, MAX_LINE_LENGTH, fp)){
         strcpy(linesCopy, line);
@@ -33,7 +33,7 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
             token = strtok(line, " \t\n");
             if(is_label(token, lineNumber)){
                 copy_label_name(label, token);
-                if(symbol_exists(head ,label)){
+                if(symbol_exists(*head ,label)){
                     printf("label is already defined!\n");
                 }
                 
@@ -48,12 +48,12 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
                 }
             }
             if(directFlag && labelFlag){
-                insert_symbol(head, label, DC, directType);
+                insert_symbol(*head, label, DC, directType);
                 DC++;
             }/*if it is not direct then it is code*/
             else if(!directFlag && validate_instruction_form(linesCopy, labelFlag, lineNumber, &args[0], &args[1])){
                 if(labelFlag){
-                    insert_symbol(head, label, IC, CODE);
+                    insert_symbol(*head, label, IC, CODE);
                     IC += find_L(args[0], args[1])+1;
                 }
             }
@@ -61,9 +61,9 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
         labelFlag = false;
         directFlag = false;
         lineNumber++;
-        print_symbol_list(head);
+        print_symbol_list(*head);
     }
-    print_symbol_list(head);
+    print_symbol_list(*head);
     print_cmdArray();
 	print_dirArray();
 }

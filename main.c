@@ -52,7 +52,7 @@ int main(int argc, char **argv){
         first_pass(fp, argv[i], &head);
 	if (!was_error) { 
                 rewind(fp);
-                second_pass(cmdArray, argv[i], &head);
+                second_pass(cmdArray, argv[i], head);
             }
 
         printf("\n\n************* Finished %s assembling process *************\n\n", fileName);
