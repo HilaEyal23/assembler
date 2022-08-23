@@ -9,7 +9,6 @@ extern boolean ef;
 void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
 {
     cmdLine *cmdPtr = &cmdLines[0];
-    int i;
     int idx = 0;
     const char base32[32] = {
             '!', '@', '#', '$', '%', '^', '&', '*',
@@ -18,12 +17,12 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
             'o', 'p','q', 'r', 's', 't', 'u', 'v'
     };
 
-    for(i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
+    for(int i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
         printf("\nopcode: %d\n", cmdPtr->cmdIDX);
         printf("numOfOperands: %d\n", cmdPtr->numOfOperands);
         idx = code_cmd_line(cmdPtr, idx, head);
-        ic++;
-        cmdPtr++;
+        ++ic;
+        ++cmdPtr;
     }
     ic = idx++;
 
@@ -39,11 +38,12 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
     cmdWordArr[idx].bits = cmdWordArr->bits << BITS_IN_OPCODE;
 printf("\n-----------\n");
 printf("idx: %d\n cmd:", idx);
+/* well if its works in reverse than reverse */
 while (cmdWordArr[idx].bits) {
-    if (cmdWordArr[idx].bits & 1)
-        printf("1");
-    else
+    if (!cmdWordArr[idx].bits & 1)
         printf("0");
+    else
+        printf("1");
 
     cmdWordArr[idx].bits >>= 1;
 }
