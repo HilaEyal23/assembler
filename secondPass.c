@@ -6,6 +6,7 @@
 extern int cmdCnt;
 extern int ic, dc;
 word cmdWordArr[2560];
+extern boolean ef;
 
 void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head);
 int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head);
@@ -34,7 +35,6 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
             'g','h', 'i', 'j', 'k', 'l', 'm', 'n',
             'o', 'p','q', 'r', 's', 't', 'u', 'v'
     };
-
 
     for(i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
         printf("\nopcode: %d\n", cmdPtr->cmdIDX);
@@ -123,30 +123,26 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset){
 
 
 int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum){
+    int address = find_symbol_address(head, operand);
     printf("direct\n");
-    printf("<%s>\n", operand);
-    symbolNode *ptr = head;
-    printf("%s",ptr->currentNode.name);
-    while(ptr){
-        if(!strcmp(ptr->currentNode.name, operand)){
-	    printf("&\n");
-            cmdWordArr[idx].bits += DIRECT;
-            cmdWordArr[idx].bits << BITS_IN_METHOD;
-            cmdWordArr[currOffset + idx].bits = ptr->currentNode.address;
-            cmdWordArr[currOffset + idx].bits << BITS_IN_ADDRESS;
-            if(ptr->currentNode.type == EXTERNAL){
-                extern_exists = true;
-                /*code_extern_dir(idx);*/
-                return 1;
-            }
-            insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
-            return 1;
-        }
+    if(address == NOT_FOUND){
+	ef = true;
+	printf("error in line %d: %s is not found\n", lineNum, operand);
+	return 0;
     }
-    err = true;
-    printf("error in line %d: label is not found\n", lineNum);
 
-    return 0;
+    printf("%s address: %d\n", operand, address);
+    cmdWordArr[idx].bits += DIRECT;
+    cmdWordArr[idx].bits << BITS_IN_METHOD;
+    cmdWordArr[currOffset + idx].bits = address;
+    cmdWordArr[currOffset + idx].bits << BITS_IN_ADDRESS;
+    if(find_symbol_type(head, operand) == EXTERNAL){
+        extern_exists = true;
+        /*code_extern_dir(idx);*/
+        return 1;
+    }
+    insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
+    return 1;
 }
 
 int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum){

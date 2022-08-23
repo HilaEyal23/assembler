@@ -50,6 +50,7 @@ int main(int argc, char **argv){
         printf("************* Started %s assembling process *************\n\n", fileName);
 	reset_global_vars();
         first_pass(fp, argv[i], &head);
+	print_symbol_list(head);
 	if (!was_error) { 
                 rewind(fp);
                 second_pass(cmdArray, argv[i], head);

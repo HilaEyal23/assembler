@@ -45,12 +45,24 @@ int symbol_exists(symbolNode *head, char *name){
     return false;
 }
 
-int find_symbol_value(symbolNode *head, char *name){
+int find_symbol_address(symbolNode *head, char *name){
     symbolNode *ptr = head;
     while(ptr){
         if(!strcmp(ptr->currentNode.name, name)) {
             return ptr->currentNode.address;
         }
+	ptr = ptr->next;
+    }
+    return NOT_FOUND;
+}
+
+int find_symbol_type(symbolNode *head, char *name){
+    symbolNode *ptr = head;
+    while(ptr){
+        if(!strcmp(ptr->currentNode.name, name)) {
+            return ptr->currentNode.type;
+        }
+	ptr = ptr->next;
     }
     return NOT_FOUND;
 }
