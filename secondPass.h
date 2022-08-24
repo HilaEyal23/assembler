@@ -5,7 +5,6 @@
 #include "utils.h"
 #include "symbolList.h"
 #include "externVars.h"
-#include "operation.h"
 
 void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head);
 
