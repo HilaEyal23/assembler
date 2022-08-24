@@ -39,6 +39,8 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
 
     switch (cmdPtr->numOfOperands) {
         case 0:
+            cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
+            cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
             print_line_binary(idx, offset);
             return idx + offset;
         case 1:
@@ -71,7 +73,7 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
         case SECOND_ADDRESS:
             return code_direct(idx, operand, operandNum, head, currOffset, lineNum, numOfOperands);
         case THIRD_ADDRESS:
-            return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
+            return code_relative(idx, operand, operandNum, head, currOffset, lineNum, numOfOperands);
         case FOURTH_ADDRESS:
             return code_register(idx, operand, operandNum, currOffset, numOfOperands);
         default:
@@ -143,9 +145,50 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     return 1;
 }
 
-int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum) {
+int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum, int numOfOperands) {
+    unsigned int address;
+    char *token;
+    char operandCopy[MAX_LINE_LENGTH];
+
+    strcpy(operandCopy, operand);
+    token = strtok(operandCopy, ".");
+
+    address = find_symbol_address(head, token);
+    if(address == NOT_FOUND){
+        ef = true;
+        printf("error in line %d: %s is not found\n", lineNum, token);
+        return 0;
+    }
     printf("relative\n");
-/*cmdWordArr[idx].bits += RELATIVE;
+    printf("%s address: %d\n", token, address);
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= RELATIVE;
+
+    if(operandNum == 2){
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+    else if(operandNum == 1 && numOfOperands == 1){
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+
+    token = strtok(NULL, " \n");
+    cmdWordArr[currOffset + idx].bits = atoi(token);
+    if(find_symbol_type(head, operand) == EXTERNAL){
+        extern_exists = true;
+        /*code_extern_dir(idx);*/
+        cmdWordArr[currOffset + idx].bits = insert_are(cmdWordArr[currOffset + idx].bits, EXTERNAL);
+        return 1;
+    }
+    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
+    return 1;
+
+
+
+
+
+
+    /*cmdWordArr[idx].bits += RELATIVE;
     cmdWordArr[idx].bits << BITS_IN_METHOD;
     char *token;
     char operandCopy[MAX_LINE_LENGTH];
