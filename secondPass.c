@@ -85,16 +85,33 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
 
 int code_immediate(int idx, char *operand, int operandNum, int currOffset, int numOfOperands){
     char positive[MAX_LINE_LENGTH] = {0};
-    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-    cmdWordArr[idx].bits |= IMMEDIATE;
+    /*cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= IMMEDIATE;*/
 
-    if(operandNum == 2){
+    if(operandNum == 1){
+        if(numOfOperands == 1) {
+            cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= IMMEDIATE;
+            cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+        }
+        else{
+            cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= IMMEDIATE;
+        }
+    }
+    else{
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits |= IMMEDIATE;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+
+    /*if(operandNum == 2){
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
     else if(operandNum == 1 && numOfOperands == 1){
         cmdWordArr[idx].bits <<= BITS_IN_METHOD;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
-    }
+    }*/
 
     operand++; /*skips '#'*/
 
@@ -123,7 +140,7 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     }
     printf("direct\n");
     printf("%s address: %d\n", operand, address);
-    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    /*cmdWordArr[idx].bits <<= BITS_IN_METHOD;
     cmdWordArr[idx].bits |= DIRECT;
 
     if(operandNum == 2){
@@ -132,7 +149,24 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     else if(operandNum == 1 && numOfOperands == 1){
         cmdWordArr[idx].bits <<= BITS_IN_METHOD;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }*/
+    if(operandNum == 1){
+        if(numOfOperands == 1) {
+            cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= DIRECT;
+            cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+        }
+        else{
+            cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= DIRECT;
+        }
     }
+    else{
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits |= DIRECT;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+
 
     cmdWordArr[currOffset + idx].bits = address;
     if(find_symbol_type(head, operand) == EXTERNAL){
