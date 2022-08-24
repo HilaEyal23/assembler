@@ -36,7 +36,6 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
 int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
     int offset = 1;
     cmdWordArr[idx].bits = cmdPtr->cmdIDX; /*encodes the opcode to the first word of the line*/
-    /*cmdWordArr[idx].bits <<= BITS_IN_OPCODE;*/
 
     switch (cmdPtr->numOfOperands) {
         case 0:
@@ -74,7 +73,7 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
         case THIRD_ADDRESS:
             return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
         case FOURTH_ADDRESS:
-            return code_register(idx, operand, operandNum, currOffset);
+            return code_register(idx, operand, operandNum, currOffset, numOfOperands);
         default:
             printf("default case code_cmd_operand()\n");
             return 0;
@@ -163,24 +162,30 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
 
 
 
-int code_register(int idx, char *operand, int operandNum, int currOffset){
-    int registerIdx;
-    cmdWordArr[idx].bits += REGISTER;
+int code_register(int idx, char *operand, int operandNum, int currOffset, int numOfOperands){
+    unsigned int registerIdx;
     cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= REGISTER;
+
+    if(operandNum == 2){
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+    else if(operandNum == 1 && numOfOperands == 1){
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
 
     registerIdx = operand[1] - '0'; /* convert argument[1] to int */
     printf("registerNum:%d\n", registerIdx);
     if(operandNum == 1){
-        cmdWordArr[idx + currOffset].bits += registerIdx;
-        cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-        cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+        cmdWordArr[idx + currOffset].bits = registerIdx;
+        cmdWordArr[idx + currOffset].bits <<= BITS_IN_REGISTER;
+        cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx + currOffset].bits, ABSOLUTE);
         return 1;
     }
-    cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-    cmdWordArr[idx + currOffset].bits += registerIdx;
-    cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    cmdWordArr[idx + currOffset].bits <<= 2 * BITS_IN_REGISTER;
+    cmdWordArr[idx + currOffset].bits |= registerIdx;
+    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx + currOffset].bits, ABSOLUTE);
     return 1;
 
 }
@@ -199,16 +204,10 @@ int code_two_registers(int idx, char *src, char *dest, int currOffset)
     registerIdx = src[1] - '0'; /* convert argument[1] to int */
     printf("registerNum:%d\n", registerIdx);
     cmdWordArr[idx + currOffset].bits = registerIdx;
-    printf("r1:");
-    print_binary(cmdWordArr[idx + currOffset].bits);
-    printf("\n");
     cmdWordArr[idx + currOffset].bits <<= BITS_IN_REGISTER;
     registerIdx = dest[1] - '0'; /* convert argument[1] to int */
     printf("registerNum:%d\n", registerIdx);
     cmdWordArr[idx + currOffset].bits |= registerIdx;
-    printf("r2:");
-    print_binary(cmdWordArr[idx + currOffset].bits);
-    printf("\n");
     cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx + currOffset].bits, ABSOLUTE);
 
     return 1;
@@ -307,7 +306,6 @@ void create_output_extern(FILE *fp)
 
 FILE *open_file(char *filename, int type)
 {
-
     FILE *file;
     filename = create_file_name(filename, type); /* Creating filename with extension */
 

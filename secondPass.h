@@ -23,7 +23,7 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
 int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
 int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
 int code_two_registers(int idx, char *src, char *dest, int currOffset);
-int code_register(int idx, char *operand, int operandNum, int currOffset);
+int code_register(int idx, char *operand, int operandNum, int currOffset, int numOfOperands);
 
 
 
