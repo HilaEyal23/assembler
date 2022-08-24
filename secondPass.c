@@ -66,74 +66,34 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
 
 
 int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
-
     int offset = 1;
-
     cmdWordArr[idx].bits = cmdPtr->cmdIDX; /*encodes the opcode to the first word of the line*/
-
-    cmdWordArr[idx].bits <<= BITS_IN_OPCODE;
-
-
-    /*printf("cmdIdx: %d\n",  cmdPtr->cmdIDX);
-    printf("opcode binary:");
-    print_binary(cmdPtr->cmdIDX);
-    printf("\n");   
-    printf("print binary:");
-    print_binary(cmdWordArr[idx].bits);
-    printf("\n");*/
+    /*cmdWordArr[idx].bits <<= BITS_IN_OPCODE;*/
 
     switch (cmdPtr->numOfOperands) {
-
         case 0:
-		printf("print binary:");
-		print_binary(cmdWordArr[idx].bits);
-		printf("\n");
-
+            print_line_binary(idx, offset);
             return idx + offset;
-
         case 1:
-
             offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, head, cmdPtr->lineNum);
-		printf("print binary:");
-		print_binary(cmdWordArr[idx].bits);
-		printf("\n");
-
+            print_line_binary(idx, offset);
             return idx + offset;
-
         case 2:
-
             if(cmdPtr->srcType == FOURTH_ADDRESS && cmdPtr->destType == FOURTH_ADDRESS){
-
                 offset += code_two_registers(idx, cmdPtr->src, cmdPtr->dest, offset);
-		printf("print binary:");
-		print_binary(cmdWordArr[idx].bits);
-		printf("\n");
-
+                print_line_binary(idx, offset);
                 return idx + offset;
-
             }
-
             offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, head, cmdPtr->lineNum);
-
             offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, head, cmdPtr->lineNum);
-	    printf("print binary:");
-	    print_binary(cmdWordArr[idx].bits);
-	    printf("\n");
-
+            print_line_binary(idx, offset);
             return idx + offset;
-
         default:
-
             printf("default case code_cmd_line()\n");
-
             printf("%d\n",cmdPtr->numOfOperands);
-
             return 0;
-
     }
-
 }
-
 
 
 
@@ -148,13 +108,13 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
 
             return code_immediate(idx, operand, operandNum, currOffset);
 
-             case SECOND_ADDRESS:
+        case SECOND_ADDRESS:
 
-                 return code_direct(idx, operand, operandNum, head, currOffset, lineNum);
+            return code_direct(idx, operand, operandNum, head, currOffset, lineNum);
 
-             case THIRD_ADDRESS:
+        case THIRD_ADDRESS:
 
-                 return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
+            return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
 
         case FOURTH_ADDRESS:
 
@@ -180,11 +140,11 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset){
 
     cmdWordArr[idx].bits += IMMEDIATE;
 
-    
+
 
     if(operandNum == 2){
-	cmdWordArr[idx].bits >>= (BITS_IN_ARE + BITS_IN_ADDRESS);
-	cmdWordArr[idx].bits += IMMEDIATE;
+        cmdWordArr[idx].bits >>= (BITS_IN_ARE + BITS_IN_ADDRESS);
+        cmdWordArr[idx].bits += IMMEDIATE;
 
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
 
@@ -238,11 +198,11 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
 
     if(address == NOT_FOUND){
 
-	ef = true;
+        ef = true;
 
-	printf("error in line %d: %s is not found\n", lineNum, operand);
+        printf("error in line %d: %s is not found\n", lineNum, operand);
 
-	return 0;
+        return 0;
 
     }
 
@@ -369,45 +329,25 @@ int code_register(int idx, char *operand, int operandNum, int currOffset){
 
 
 int code_two_registers(int idx, char *src, char *dest, int currOffset)
-
 {
-
     int registerIdx;
-
-    cmdWordArr[idx].bits += REGISTER;
-
-    cmdWordArr[idx].bits << BITS_IN_METHOD;
-
-    cmdWordArr[idx].bits += REGISTER;
-
-    cmdWordArr[idx].bits << BITS_IN_METHOD;
-
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= REGISTER;
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= REGISTER;
     cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
 
-
-
     registerIdx = src[1] - '0'; /* convert argument[1] to int */
-
     printf("registerNum:%d\n", registerIdx);
-
     cmdWordArr[idx + currOffset].bits += registerIdx;
-
-    cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-
+    /*cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;*/
     registerIdx = dest[1] - '0'; /* convert argument[1] to int */
-
     printf("registerNum:%d\n", registerIdx);
-
     cmdWordArr[idx + currOffset].bits += registerIdx;
-
-    cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;
-
+    /*cmdWordArr[idx + currOffset].bits << BITS_IN_REGISTER;*/
     cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
 
-
-
     return 1;
-
 }
 
 
@@ -528,7 +468,7 @@ void create_output_extern(FILE *fp)
     do
     {
         base32_address = convert_to_base_32(node->currSymbol.address);
-        fprintf(fp, "%s\t%s\n", node->currSymbol.name, base32_address); 
+        fprintf(fp, "%s\t%s\n", node->currSymbol.name, base32_address);
         free(base32_address);
         node = node -> next;
     } while(node != ext_list);
@@ -581,5 +521,12 @@ void print_binary(unsigned int number)
     putc((number & 1) ? '1' : '0', stdout);
 }
 
-
-
+void print_line_binary(int idx, int offset)
+{
+    int i;
+    for(i=idx; i<idx+offset; i++){
+        printf("the %d word:", i);
+        print_binary(cmdWordArr[i].bits);
+        printf("\n");
+    }
+}
