@@ -133,14 +133,13 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     }
 
     cmdWordArr[currOffset + idx].bits = address;
-    cmdWordArr[currOffset + idx].bits <<= BITS_IN_ARE;
     if(find_symbol_type(head, operand) == EXTERNAL){
         extern_exists = true;
         /*code_extern_dir(idx);*/
         cmdWordArr[currOffset + idx].bits = insert_are(cmdWordArr[currOffset + idx].bits, EXTERNAL);
         return 1;
     }
-    insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
+    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
     return 1;
 }
 
