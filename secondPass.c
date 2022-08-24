@@ -178,36 +178,9 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
         extern_exists = true;
         /*code_extern_dir(idx);*/
         cmdWordArr[currOffset + idx].bits = insert_are(cmdWordArr[currOffset + idx].bits, EXTERNAL);
-        return 1;
-    }
-    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
-    return 1;
-
-
-
-
-
-
-    /*cmdWordArr[idx].bits += RELATIVE;
-    cmdWordArr[idx].bits << BITS_IN_METHOD;
-    char *token;
-    char operandCopy[MAX_LINE_LENGTH];
-    int value;
-
-    strcpy(operandCopy, operand);
-    token = strtok(operandCopy, ".");
-    value = find_symbol_value(head, token);
-    if (value == NOT_FOUND){
-        err = true;
-        printf("error: line %d,struct does not exists\n", lineNum);
         return 2;
     }
-    cmdWordArr[currOffset + idx].bits += value;
-    cmdWordArr[currOffset + idx].bits << BITS_IN_ADDRESS;
-    insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
-    currOffset++;
-    token = strtok(NULL, " \n");
-    cmdWordArr[currOffset + idx].bits += atoi(token);*/
+    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
     return 2;
 }
 
