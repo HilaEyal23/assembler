@@ -20,7 +20,7 @@ int code_data_dir(char *operand, int idx);
 int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head);
 int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum, int numOfOperands);
 int code_immediate(int idx, char *operand, int operandNum, int currOffset, int numOfOperands);
-int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
+int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum, int numOfOperands);
 int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum);
 int code_two_registers(int idx, char *src, char *dest, int currOffset);
 int code_register(int idx, char *operand, int operandNum, int currOffset, int numOfOperands);

@@ -69,7 +69,7 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
         case FIRST_ADDRESS:
             return code_immediate(idx, operand, operandNum, currOffset, numOfOperands);
         case SECOND_ADDRESS:
-            return code_direct(idx, operand, operandNum, head, currOffset, lineNum);
+            return code_direct(idx, operand, operandNum, head, currOffset, lineNum, numOfOperands);
         case THIRD_ADDRESS:
             return code_relative(idx, operand, operandNum, head, currOffset, lineNum);
         case FOURTH_ADDRESS:
@@ -112,23 +112,32 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
 
 
 
-int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum){
-    int address = find_symbol_address(head, operand);
-    printf("direct\n");
+int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum, int numOfOperands){
+    unsigned int address = find_symbol_address(head, operand);;
     if(address == NOT_FOUND){
         ef = true;
         printf("error in line %d: %s is not found\n", lineNum, operand);
         return 0;
     }
-
+    printf("direct\n");
     printf("%s address: %d\n", operand, address);
-    cmdWordArr[idx].bits += DIRECT;
-    cmdWordArr[idx].bits << BITS_IN_METHOD;
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= DIRECT;
+
+    if(operandNum == 2){
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+    else if(operandNum == 1 && numOfOperands == 1){
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+
     cmdWordArr[currOffset + idx].bits = address;
-    cmdWordArr[currOffset + idx].bits << BITS_IN_ADDRESS;
+    cmdWordArr[currOffset + idx].bits <<= BITS_IN_ARE;
     if(find_symbol_type(head, operand) == EXTERNAL){
         extern_exists = true;
         /*code_extern_dir(idx);*/
+        cmdWordArr[currOffset + idx].bits = insert_are(cmdWordArr[currOffset + idx].bits, EXTERNAL);
         return 1;
     }
     insert_are(cmdWordArr[currOffset + idx].bits, RELOCATABLE);
