@@ -13,9 +13,9 @@ void preprocess(FILE *fp, char *fileName){
     char *p; 
     int i = 1;
 
+    FILE *preprocessedFile = fopen(amFile, "w");
     strcpy(amFile,fileName);
     strcat(amFile,".am");
-    FILE *preprocessedFile = fopen(amFile, "w");
     head = init_macro_node(NULL, "999","999");
     content = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
 

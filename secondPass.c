@@ -14,12 +14,12 @@ void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolN
     dirLine *dirPtr = &dirLines[0];
     int i;
     int idx = 0;
-    const char base32[32] = {
+    /*const char base32[32] = {
             '!', '@', '#', '$', '%', '^', '&', '*',
             '<','>', 'a', 'b', 'c','d', 'e', 'f',
             'g','h', 'i', 'j', 'k', 'l', 'm', 'n',
             'o', 'p','q', 'r', 's', 't', 'u', 'v'
-    };
+    };*/
 
     for(i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
         printf("\nopcode: %d\n", cmdPtr->cmdIDX);
@@ -32,7 +32,8 @@ void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolN
 
     idx = 0;
     for(i=0; i<dirCnt; i++){ /*encodes data commands*/
-        idx += code_dir_line(dirPtr, idx);
+        idx = code_dir_line(dirPtr, idx);
+        printf("<%d>\n", idx);
         dirPtr++;
     }
     dc = idx;
@@ -292,22 +293,22 @@ int code_dir_line(dirLine *dirPtr, int idx){
 }
 
 int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx){
+    int currOffset;
     printf("data!\n");
-     int currOffset;
 
-     for(currOffset=0; currOffset < numOfOperands ; currOffset++){
-         printf("%s\n", operand[currOffset]);
-         dirWordArr[idx + currOffset].bits = atoi(operand[currOffset]);
-         print_binary(dirWordArr[idx + currOffset].bits);
-         printf("\n");
-     }
-     printf("idx+off: %d\n", idx+currOffset);
+    for(currOffset=0; currOffset < numOfOperands ; currOffset++){
+        printf("%s\n", operand[currOffset]);
+        dirWordArr[idx + currOffset].bits = atoi(operand[currOffset]);
+        print_binary(dirWordArr[idx + currOffset].bits);
+        printf("\n");
+    }
+    printf("idx+off: %d\n", idx+currOffset);
     return idx + currOffset;
 }
 
 int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
-    printf("string!\n");
     int j = 1;
+    printf("string!\n");
 
     while(operand[structIdx][j] != '"'){
         dirWordArr[idx + j].bits = operand[structIdx][j] - '\0';
