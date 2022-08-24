@@ -98,7 +98,7 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
 
     if(operand[0] == '-'){
         strcpy(positive, &operand[1]);
-        cmdWordArr[idx + currOffset].bits += -1 * atoi(positive);
+        cmdWordArr[idx + currOffset].bits = -1 * atoi(positive);
         printf("operand: %d\n", -1*atoi(positive));
     }
     else {
@@ -106,7 +106,7 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
         printf("operand: %d\n", atoi(operand));
     }
 
-    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx + currOffset].bits, ABSOLUTE);
     return 1;
 }
 
