@@ -48,7 +48,7 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
             print_line_binary(idx, offset);
             return idx + offset;
         case 2:
-            if(cmdPtr->srcType == FOURTH_ADDRESS && cmdPtr->destType == FOURTH_ADDRESS){
+            if(cmdPtr->srcType == REG_OP && cmdPtr->destType == REG_OP){
                 offset += code_two_registers(idx, cmdPtr->src, cmdPtr->dest, offset);
                 print_line_binary(idx, offset);
                 return idx + offset;
@@ -68,13 +68,13 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
 int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum, int numOfOperands){
     /*printf("type: %d\n", type);*/
     switch (type) {
-        case FIRST_ADDRESS:
+        case IMMEDIATE_OP:
             return code_immediate(idx, operand, operandNum, currOffset, numOfOperands);
-        case SECOND_ADDRESS:
+        case DIRECT_OP:
             return code_direct(idx, operand, operandNum, head, currOffset, lineNum, numOfOperands);
-        case THIRD_ADDRESS:
+        case STRUCT_OP:
             return code_relative(idx, operand, operandNum, head, currOffset, lineNum, numOfOperands);
-        case FOURTH_ADDRESS:
+        case REG_OP:
             return code_register(idx, operand, operandNum, currOffset, numOfOperands);
         default:
             printf("default case code_cmd_operand()\n");
