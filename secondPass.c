@@ -43,7 +43,7 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
             print_line_binary(idx, offset);
             return idx + offset;
         case 1:
-            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, head, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 1, head, cmdPtr->lineNum, cmdPtr->numOfOperands);
             print_line_binary(idx, offset);
             return idx + offset;
         case 2:
@@ -52,8 +52,8 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
                 print_line_binary(idx, offset);
                 return idx + offset;
             }
-            offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, head, cmdPtr->lineNum);
-            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, head, cmdPtr->lineNum);
+            offset += code_cmd_operand(cmdPtr->src, cmdPtr->srcType, idx, offset, 1, head, cmdPtr->lineNum, cmdPtr->numOfOperands);
+            offset += code_cmd_operand(cmdPtr->dest, cmdPtr->destType, idx, offset, 2, head, cmdPtr->lineNum, cmdPtr->numOfOperands);
             print_line_binary(idx, offset);
             return idx + offset;
         default:
@@ -64,11 +64,11 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
 }
 
 
-int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum){
+int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum, int numOfOperands){
     /*printf("type: %d\n", type);*/
     switch (type) {
         case FIRST_ADDRESS:
-            return code_immediate(idx, operand, operandNum, currOffset);
+            return code_immediate(idx, operand, operandNum, currOffset, numOfOperands);
         case SECOND_ADDRESS:
             return code_direct(idx, operand, operandNum, head, currOffset, lineNum);
         case THIRD_ADDRESS:
@@ -82,13 +82,16 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
 }
 
 
-int code_immediate(int idx, char *operand, int operandNum, int currOffset){
+int code_immediate(int idx, char *operand, int operandNum, int currOffset, int numOfOperands){
     char positive[MAX_LINE_LENGTH] = {0};
-    cmdWordArr[idx].bits += IMMEDIATE;
+    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+    cmdWordArr[idx].bits |= IMMEDIATE;
 
     if(operandNum == 2){
-        cmdWordArr[idx].bits >>= (BITS_IN_ARE + BITS_IN_ADDRESS);
-        cmdWordArr[idx].bits += IMMEDIATE;
+        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    }
+    else if(operandNum == 1 && numOfOperands == 1){
+        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
 
