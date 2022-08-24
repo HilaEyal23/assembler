@@ -7,13 +7,7 @@
 #include "externVars.h"
 #include "operation.h"
 
-void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head);
-
-
-/****** FUNCTIONS WHICH DEAL WITH ENCODING DIRECTIVE COMMANDS ******/
-
-int code_dir_line(dirLine *dirPtr, int idx);
-int code_data_dir(char *operand, int idx);
+void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolNode *head);
 
 
 /****** FUNCTIONS WHICH DEAL WITH ENCODING INSTRUCTION COMMANDS ******/
@@ -25,6 +19,15 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
 int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum, int numOfOperands);
 int code_two_registers(int idx, char *src, char *dest, int currOffset);
 int code_register(int idx, char *operand, int operandNum, int currOffset, int numOfOperands);
+
+
+
+/****** FUNCTIONS WHICH DEAL WITH ENCODING DIRECTIVE COMMANDS ******/
+
+int code_dir_line(dirLine *dirPtr, int idx);
+int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx);
+int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx);
+int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx);
 
 
 
@@ -44,3 +47,4 @@ void print_binary(unsigned int number);
 void print_line_binary(int idx, int offset);
 
 #endif /*_SECONDPASS_H*/
+

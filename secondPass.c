@@ -1,14 +1,17 @@
 #include "secondPass.h"
 
 extern int cmdCnt;
+extern int dirCnt;
 extern int ic, dc;
 word cmdWordArr[2560];
+word dirWordArr[2560];
 extern boolean ef;
 void print_word(int word);
 
-void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
+void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolNode *head)
 {
     cmdLine *cmdPtr = &cmdLines[0];
+    dirLine *dirPtr = &dirLines[0];
     int i;
     int idx = 0;
     const char base32[32] = {
@@ -27,11 +30,18 @@ void second_pass(cmdLine cmdLines[], char *fileName, symbolNode *head)
     }
     ic = idx++;
 
+    idx = 0;
+    for(i=0; i<dirCnt; i++){ /*encodes data commands*/
+        idx += code_dir_line(dirPtr, idx);
+        dirPtr++;
+    }
+    dc = idx;
+
     create_output_files(fileName);
 }
 
 
-
+/****** FUNCTIONS WHICH DEAL WITH ENCODING INSTRUCTION COMMANDS ******/
 
 int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
     int offset = 1;
@@ -105,14 +115,6 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
 
-    /*if(operandNum == 2){
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
-    }
-    else if(operandNum == 1 && numOfOperands == 1){
-        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
-    }*/
-
     operand++; /*skips '#'*/
 
     if(operand[0] == '-'){
@@ -140,16 +142,7 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     }
     printf("direct\n");
     printf("%s address: %d\n", operand, address);
-    /*cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-    cmdWordArr[idx].bits |= DIRECT;
 
-    if(operandNum == 2){
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
-    }
-    else if(operandNum == 1 && numOfOperands == 1){
-        cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
-    }*/
     if(operandNum == 1){
         if(numOfOperands == 1) {
             cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
@@ -166,7 +159,6 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
         cmdWordArr[idx].bits |= DIRECT;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
-
 
     cmdWordArr[currOffset + idx].bits = address;
     if(find_symbol_type(head, operand) == EXTERNAL){
@@ -195,14 +187,21 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
     }
     printf("relative\n");
     printf("%s address: %d\n", token, address);
-    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-    cmdWordArr[idx].bits |= RELATIVE;
 
-    if(operandNum == 2){
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    if(operandNum == 1){
+        if(numOfOperands == 1) {
+            cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= RELATIVE;
+            cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+        }
+        else{
+            cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= RELATIVE;
+        }
     }
-    else if(operandNum == 1 && numOfOperands == 1){
+    else{
         cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits |= RELATIVE;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
 
@@ -218,18 +217,23 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
     return 2;
 }
 
-
-
 int code_register(int idx, char *operand, int operandNum, int currOffset, int numOfOperands){
     unsigned int registerIdx;
-    cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-    cmdWordArr[idx].bits |= REGISTER;
 
-    if(operandNum == 2){
-        cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+    if(operandNum == 1){
+        if(numOfOperands == 1) {
+            cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= REGISTER;
+            cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
+        }
+        else{
+            cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+            cmdWordArr[idx].bits |= REGISTER;
+        }
     }
-    else if(operandNum == 1 && numOfOperands == 1){
+    else{
         cmdWordArr[idx].bits <<= BITS_IN_METHOD;
+        cmdWordArr[idx].bits |= REGISTER;
         cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
     }
 
@@ -247,8 +251,6 @@ int code_register(int idx, char *operand, int operandNum, int currOffset, int nu
     return 1;
 
 }
-
-
 
 int code_two_registers(int idx, char *src, char *dest, int currOffset)
 {
@@ -273,9 +275,62 @@ int code_two_registers(int idx, char *src, char *dest, int currOffset)
 
 
 
+/****** FUNCTIONS WHICH DEAL WITH ENCODING DIRECTIVE COMMANDS ******/
+
+int code_dir_line(dirLine *dirPtr, int idx){
+    switch(dirPtr->dirType){
+        case DATA:
+            return code_data_dir(dirPtr->operands, dirPtr->operand_cnt, idx);
+        case STRING:
+            return code_string_dir(dirPtr->operands, idx, 0);
+        case STRUCT:
+            return code_struct_dir(dirPtr->operands, idx);
+        default:
+            printf("default case code_dir_line()\n");
+            return 0;
+    }
+}
+
+int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx){
+    printf("data!\n");
+     int currOffset;
+
+     for(currOffset=0; currOffset < numOfOperands ; currOffset++){
+         printf("%s\n", operand[currOffset]);
+         dirWordArr[idx + currOffset].bits = atoi(operand[currOffset]);
+         print_binary(dirWordArr[idx + currOffset].bits);
+         printf("\n");
+     }
+     printf("idx+off: %d\n", idx+currOffset);
+    return idx + currOffset;
+}
+
+int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
+    printf("string!\n");
+    int j = 1;
+
+    while(operand[structIdx][j] != '"'){
+        dirWordArr[idx + j].bits = operand[structIdx][j] - '\0';
+        print_binary(dirWordArr[idx + j].bits);
+        printf("\n");
+        j++;
+    }
+    dirWordArr[idx + j].bits = 0;
+    print_binary(dirWordArr[idx + j].bits);
+    printf("\n");
+    return idx + j + 1;
+}
+
+int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx){
+    printf("struct!\n");
+    dirWordArr[idx].bits = atoi(operand[0]);
+    print_binary(dirWordArr[idx].bits);
+    printf("\n");
+    return 1 + code_string_dir(operand, ++idx, 1);
+}
+
+
 /****** FUNCTIONS WHICH DEAL WITH OUTPUT FILES ******/
-
-
 
 int create_output_files(char *fileName){
     FILE *file;
@@ -316,6 +371,19 @@ void create_ob_file(FILE *fp)
 
         param1 = convert_to_base_32(address);
         param2 = convert_to_base_32(cmdWordArr[idx].bits);
+
+        fprintf(fp, "\t\t\t\t\t\t\t\t%s\t\t\t\t%s\n\n", param1, param2);
+        free(param1);
+        free(param2);
+    }
+
+    fprintf(fp, "data:\n");
+    fprintf(fp, "%d\n", dc);
+    for (idx = 0; idx < dc; address++, idx++) /* Instructions memory */
+    {
+
+        param1 = convert_to_base_32(address);
+        param2 = convert_to_base_32(dirWordArr[idx].bits);
 
         fprintf(fp, "\t\t\t\t\t\t\t\t%s\t\t\t\t%s\n\n", param1, param2);
         free(param1);
@@ -398,3 +466,4 @@ void print_line_binary(int idx, int offset)
         printf("\n");
     }
 }
+

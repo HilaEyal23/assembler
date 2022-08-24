@@ -46,7 +46,7 @@ int assembler(int argc, char **argv){
             print_symbol_list(head);
             if (!was_error) { 
                 rewind(fp);
-                second_pass(cmdArray, argv[i], head);
+                second_pass(cmdArray, dirArray, argv[i], head);
             }
 
             printf("\n\n************* Finished %s assembling process *************\n\n", fileName);
