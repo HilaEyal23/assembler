@@ -35,10 +35,7 @@
 #define INSTRUCTION_AMOUNT 5
 #define ERRORS_AMOUNT 37
 
-#define FIRST_ADDRESS 1    /*0001*/
-#define SECOND_ADDRESS 2   /*0010*/
-#define THIRD_ADDRESS 4    /*0100*/
-#define FOURTH_ADDRESS 8   /*1000*/
+
 
 #define BITS_IN_WORD 10
 #define BITS_IN_OPCODE 4

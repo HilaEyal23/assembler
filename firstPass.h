@@ -2,7 +2,7 @@
 #define _FIRSTPASS_H
 
 #include "symbolList.h"
-#include "operationTable.h"
+#include "operation.h"
 #include "structs.h"
 
 /*#include "extern_vars.h"*/
@@ -13,12 +13,19 @@ void get_command(char *p, char command[]);
 int get_operand_type(char *op);
 int get_direct_type(char *token, int lineNumber);
 int find_L(int address1, int address2);
+void add_IC_to_directs(symbolNode *head, int IC);
 
 /******VALIDATION FUNCTIONS******/
 int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *arg1, int *arg2);
-int validate_direct_form(char *line, int labelFlag, int lineNumber);
-int validate_input_form(char *line, int min_args);
+int validate_direct_form(char *line, int labelFlag, int lineNumber, int *DCL);
 int validate_command(char *token, int lineNumber);
+void validate_entry(int **DCL, int lineNumber, int labelFlag);
+void validate_extern(int **DCl, int lineNumber, int labelFlag);
+void validate_struct(int **DCL, int lineNumber, int labelFlag);
+void validate_data(int **DCL, int lineNumber, int labelFlag);
+void validate_string(int **DCL, int lineNumber, int labelFlag);
+int check_extra_text(char *token, int lineNumber);
+void validate_input_form(char input[], int labelFlag, int lineNumber);
 
 /******PARSING FUNCTIONS******/
 void skip_command(char **p);
