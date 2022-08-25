@@ -2,6 +2,7 @@
 
 
 void preprocess(FILE *fp, char *fileName){
+    FILE *preprocessedFile;
     char line[MAX_LINE_LENGTH];
     char lineCopy[MAX_LINE_LENGTH];
     char name[MAX_LINE_LENGTH];
@@ -12,10 +13,11 @@ void preprocess(FILE *fp, char *fileName){
     int macroFlag = false;
     char *p; 
     int i = 1;
+    
 
     strcpy(amFile,fileName);
     strcat(amFile,".am");
-    FILE *preprocessedFile = fopen(amFile, "w");
+    preprocessedFile = fopen(amFile, "w");
     head = init_macro_node(NULL, "999","999");
     content = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
     while(fgets(line, MAX_LINE_LENGTH, fp)){
