@@ -300,19 +300,21 @@ int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx){
 }
 
 int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
-    int j = 1;
+    int currOffset = structIdx;
     printf("string!\n");
+    printf("%s\n", operand[structIdx]);
 
-    while(operand[structIdx][j] != '"' && operand[structIdx][j] != '\0') {
-        dirWordArr[idx + j].bits = operand[structIdx][j] - '\0';
-        print_binary(dirWordArr[idx + j].bits);
+    while(operand[structIdx][currOffset] != '\0' && operand[structIdx][currOffset] != '"') {
+        dirWordArr[idx + currOffset].bits = operand[structIdx][currOffset] - '\0';
+        print_binary(dirWordArr[idx + currOffset].bits);
         printf("\n");
-        j++;
+        currOffset++;
     }
-    dirWordArr[idx + j].bits = 0;
-    print_binary(dirWordArr[idx + j].bits);
+    dirWordArr[idx + currOffset].bits = 0;
+    currOffset++;
+    print_binary(dirWordArr[idx + currOffset].bits);
     printf("\n");
-    return idx + j + 1;
+    return idx + currOffset;
 }
 
 int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx){
