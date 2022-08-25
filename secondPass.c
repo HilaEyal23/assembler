@@ -303,7 +303,7 @@ int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
     int j = 1;
     printf("string!\n");
 
-    while(operand[structIdx][j] != '"'){
+    while(operand[structIdx][j] != '"' && operand[structIdx][j] != '\0') {
         dirWordArr[idx + j].bits = operand[structIdx][j] - '\0';
         print_binary(dirWordArr[idx + j].bits);
         printf("\n");
@@ -459,4 +459,3 @@ void print_line_binary(int idx, int offset)
         printf("\n");
     }
 }
-
