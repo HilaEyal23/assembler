@@ -300,8 +300,9 @@ int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx){
 }
 
 int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
-    int currOffset = structIdx;
+    int currOffset = 0;
     printf("string!\n");
+    printf("idx+off: %d\n", idx+currOffset);
     printf("%s\n", operand[structIdx]);
 
     while(operand[structIdx][currOffset] != '\0' && operand[structIdx][currOffset] != '"') {
@@ -314,15 +315,31 @@ int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
     currOffset++;
     print_binary(dirWordArr[idx + currOffset].bits);
     printf("\n");
+    printf("idx+off: %d\n", idx+currOffset);
     return idx + currOffset;
 }
 
 int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx){
+    int currOffset = 0;
     printf("struct!\n");
     dirWordArr[idx].bits = atoi(operand[0]);
+    currOffset++;
     print_binary(dirWordArr[idx].bits);
     printf("\n");
-    return 1 + code_string_dir(operand, ++idx, 1);
+
+
+    while(operand[1][currOffset] != '\0' && operand[1][currOffset] != '"') {
+        dirWordArr[idx + currOffset].bits = operand[1][currOffset] - '\0';
+        print_binary(dirWordArr[idx + currOffset].bits);
+        printf("\n");
+        currOffset++;
+    }
+    dirWordArr[idx + currOffset].bits = 0;
+    currOffset++;
+    print_binary(dirWordArr[idx + currOffset].bits);
+    printf("\n");
+    printf("idx+off: %d\n", idx+currOffset);
+    return idx + currOffset;
 }
 
 
