@@ -64,9 +64,6 @@ void first_pass(FILE *fp, char *fileName, symbolNode **head){
         DCL = 0;
     }
     add_IC_to_directs(*head, IC); /*the data become after the commands so we add each data the IC counter*/
-    /*print_symbol_list(*head);*/
-    /*print_cmdArray();*/
-	/*print_dirArray();*/
 }
 
 void add_IC_to_directs(symbolNode *head, int IC){
@@ -196,7 +193,6 @@ int validate_direct_form(char *line, int labelFlag, int lineNumber, int *DCL){
     char *token;
     int direct_type;
     strcpy(input, line);
-    printf("%d: labelFlag: %d\n", lineNumber, labelFlag);
     validate_input_form(input, labelFlag, lineNumber);
     token = strtok(input, " ,\t\n");
     if(labelFlag){ /*if it is fkag so we need to get one more token to reach arguments*/
@@ -273,15 +269,26 @@ void validate_data(int **DCL, int lineNumber, int labelFlag){
 
 void validate_string(int **DCL, int lineNumber, int labelFlag){
     int D = 0;
+
     char *token;
     dirArray[dirCnt].operand_cnt = 0;
         token = strtok(NULL, " ,\t\n");
-        D = strlen(token)-1;
-        if(0){/*fix this*/
+        if(!token){
+            printf("%d: missing argument!\n", lineNumber);
+            ef = true;
+            return;
+        }
+        if(token[0] != '"' || token[strlen(token)-1] != '"'){
             printf("%d: missing \"!\n", lineNumber);
             ef = true;
         }
-		else{
+        token = strtok(token, "\"");
+        if(!is_alpha_word(token)){ /*if the argument is null we print error because the argument is missing*/
+            printf("%d: argument is not a number!\n", lineNumber);
+            ef = true;
+        }
+        D = strlen(token)-1;
+		if(ef == 0){
 			strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 			dirArray[dirCnt].operand_cnt++;
 		}
@@ -568,24 +575,6 @@ int is_label(char *token, int lineNumber){
         }
     }
 
-    /* check if it's a register name */
-    /*if (token[0] == 'r')
-    {
-        int j = 0;
-        char number[MAX_LEN] = {0};
-
-        i = 1;
-
-        while ((isdigit(name[i]) || name[i] == '-' || name[i] == '+') && name[i] != ',')
-            number[j++] = name[i++];
-
-        register_number = atoi(number);
-        if (register_number >= 0 && register_number <= 15)
-        {
-            return false;
-        }
-    }*/
-
     return true;
 }
 
@@ -610,16 +599,6 @@ int is_number(char *seq){
     return true;
 }
 
-
-/*int is_number(char *num){
-    int length, i;
-    if(num == NULL) return false;
-    length = strlen(num);
-    for(i=0; i < length-1; i++){
-        if(!isdigit(num[i])) return false;
-    }
-    return true;
-}*/
 
 int is_alpha_word(char *word){
     int length, i;

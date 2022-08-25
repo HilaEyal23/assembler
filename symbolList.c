@@ -66,3 +66,24 @@ int find_symbol_type(symbolNode *head, char *name){
     }
     return NOT_FOUND;
 }
+
+/*void free_symbol_list(symbolNode *head){
+    symbolNode* temp;
+    temp = head;
+    while(temp){
+        free(temp->currentNode.name);
+        free(temp);
+        temp = temp->next;
+    }
+}*/
+
+void free_symbol_list(symbolNode *head)
+{
+    symbolNode* temp;
+    while(head){
+        temp = head;
+        head = head->next;
+        free(temp->currentNode.name);
+        free(temp);
+    }
+}

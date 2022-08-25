@@ -13,12 +13,11 @@ void preprocess(FILE *fp, char *fileName){
     char *p; 
     int i = 1;
 
-    FILE *preprocessedFile = fopen(amFile, "w");
     strcpy(amFile,fileName);
     strcat(amFile,".am");
+    FILE *preprocessedFile = fopen(amFile, "w");
     head = init_macro_node(NULL, "999","999");
     content = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
-
     while(fgets(line, MAX_LINE_LENGTH, fp)){
         strcpy(lineCopy, line);
         token = strtok(lineCopy, " \t");
@@ -38,15 +37,16 @@ void preprocess(FILE *fp, char *fileName){
 
                 macroFlag = false;
                 insert_at_end(&head, name, content);
-                
+                free(content);
                 content = (char*)malloc(MAX_LINE_LENGTH * sizeof(char));
-                p = NULL;
                 i = 1;
             }
             else{        
-                p = (char*)realloc(content, MAX_LINE_LENGTH*sizeof(char)*i);  
-                if(p == NULL) printf("error with allocation!");
-                else content = p;         
+                p = (char*)realloc(content, MAX_LINE_LENGTH*sizeof(char)*i); 
+                if(p == NULL){ 
+                    printf("error with allocation!");
+                }
+                else content = p;       
                 strcat(content, lineCopy);
             }
         }
@@ -54,8 +54,8 @@ void preprocess(FILE *fp, char *fileName){
             fputs(line, preprocessedFile);
         }
     }
+    free(content);
     fclose(preprocessedFile);
-    print_macro_list(head);
     free_macro_list(head);
 }
 

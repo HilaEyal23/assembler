@@ -28,6 +28,7 @@ void print_symbol_list(symbolNode* head);
 int symbol_exists(symbolNode *head, char *name);
 int find_symbol_address(symbolNode *head, char *name);
 int find_symbol_type(symbolNode *head, char *name);
+void free_symbol_list(symbolNode *head);
 
 
 

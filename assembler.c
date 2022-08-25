@@ -28,27 +28,26 @@ int assembler(int argc, char **argv){
     for(i = 1; i < argc; i++)
     {
         strcpy(fileName, argv[i]);
-        puts(argv[i]);
+
         fp = fopen(fileName, "r");
         if(fp != NULL) { 
             printf("************* Started %s assembling process *************\n\n", fileName);
-            puts(fileName);
+
             preprocess(fp, fileName);
             reset_global_vars();
-            puts(fileName);
+
             strcpy(amFileName, fileName);
             strcat(amFileName, ".am\0");
-            puts(amFileName);
+
             fclose(fp);
             fp = fopen(amFileName, "r");
             /*fp = fopen("text1.am", "r");*/
             first_pass(fp, fileName, &head);
-            print_symbol_list(head);
             if (!was_error) { 
                 rewind(fp);
                 second_pass(cmdArray, dirArray, argv[i], head);
             }
-
+            free_symbol_list(head);
             printf("\n\n************* Finished %s assembling process *************\n\n", fileName);
         }
         else{

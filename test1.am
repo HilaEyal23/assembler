@@ -5,6 +5,6 @@ prn HIMY
 mov HI,r3
 hlt 
 mov r3,r3
-mov r3,r7
+mov r3,#5
 .string "ilai"
 .struct 5,"ilai"

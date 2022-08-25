@@ -11,15 +11,20 @@ void stream_macro(FILE *fp, macroNode *head, char *name){
    return;
 
 }
-void free_macro_list(macroNode *head){
+
+void free_macro_list(macroNode *head)
+{
     macroNode* temp;
-    temp = head;
-    while(temp){
+    while(head){
+        temp = head;
+        head = head->next;
         free(temp->currMacro.content);
         free(temp->currMacro.name);
-        temp = temp->next;
+        free(temp);
     }
 }
+
+
 void insert_at_end(macroNode** head, char *name, char* content)
 {
     macroNode *temp = *head;

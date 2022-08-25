@@ -141,8 +141,6 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
         printf("error in line %d: %s is not found\n", lineNum, operand);
         return 0;
     }
-    printf("direct\n");
-    printf("%s address: %d\n", operand, address);
 
     if(operandNum == 1){
         if(numOfOperands == 1) {
@@ -186,8 +184,6 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
         printf("error in line %d: %s is not found\n", lineNum, token);
         return 0;
     }
-    printf("relative\n");
-    printf("%s address: %d\n", token, address);
 
     if(operandNum == 1){
         if(numOfOperands == 1) {
@@ -239,7 +235,6 @@ int code_register(int idx, char *operand, int operandNum, int currOffset, int nu
     }
 
     registerIdx = operand[1] - '0'; /* convert argument[1] to int */
-    printf("registerNum:%d\n", registerIdx);
     if(operandNum == 1){
         cmdWordArr[idx + currOffset].bits = registerIdx;
         cmdWordArr[idx + currOffset].bits <<= BITS_IN_REGISTER;
@@ -263,11 +258,9 @@ int code_two_registers(int idx, char *src, char *dest, int currOffset)
     cmdWordArr[idx].bits = insert_are(cmdWordArr[idx].bits, ABSOLUTE);
 
     registerIdx = src[1] - '0'; /* convert argument[1] to int */
-    printf("registerNum:%d\n", registerIdx);
     cmdWordArr[idx + currOffset].bits = registerIdx;
     cmdWordArr[idx + currOffset].bits <<= BITS_IN_REGISTER;
     registerIdx = dest[1] - '0'; /* convert argument[1] to int */
-    printf("registerNum:%d\n", registerIdx);
     cmdWordArr[idx + currOffset].bits |= registerIdx;
     cmdWordArr[idx + currOffset].bits = insert_are(cmdWordArr[idx + currOffset].bits, ABSOLUTE);
 
@@ -378,8 +371,7 @@ void create_ob_file(FILE *fp)
         free(param2);
     }
 
-    fprintf(fp, "data:\n");
-    fprintf(fp, "%d\n", dc);
+
     for (idx = 0; idx < dc; address++, idx++) /* Instructions memory */
     {
 
