@@ -67,6 +67,8 @@ void validate_entry(int **DCL, int lineNumber, int labelFlag, entry *entHead);
  */
 void validate_extern(int **DCl, int lineNumber, int labelFlag, external *extHead);
 
+
+int validate_label(char *token);
 /**
  * validates structure line.
  */

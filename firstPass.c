@@ -115,9 +115,37 @@ int get_operand_type(char *op){
         i++;
     }
 
-    if(is_alpha_word(op)) return DIRECT_OP;
+    if(validate_label(op)) return DIRECT_OP;
     
     return -1;
+
+}
+
+int validate_label(char *token){
+    int i;
+  if (!isalpha(token[0])){
+        printf("label can not start with digit!\n");
+        return false;
+    }
+        
+    for (i = 1; i < strlen(token) - 1; i++) /*after that we check if it is a unvaild symbol line * */
+    {
+        if (!isalpha(token[i]) && !isdigit(token[i]))
+            return true;
+    }
+
+    /* Loop over each command, and check if it's name is equal to a known command */
+    
+
+    /* check for directives*/
+    for(i = 0; i < 5; i++){
+        if(!strcmp(directives[i], token)){
+            printf("label can't be a directive!\n");
+            return false;
+        }
+    }
+
+    return true;
 
 }
 
@@ -164,7 +192,7 @@ void validate_input_form(char input[], int labelFlag, int lineNumber){
         tokens_cnt++;
         if(!check_comma(line[0])){
             skip_spaces(&line);
-            if(line[0] == '\n'){
+            if(line[0] == '\n' || line[0] == EOF){
                 break;
             }
             else{
@@ -189,6 +217,8 @@ void validate_input_form(char input[], int labelFlag, int lineNumber){
 
 
 }
+
+
 
 int validate_direct_form(char *line, int labelFlag, int lineNumber, int *DCL, entry *entHead, external *extHead){
     char input[MAX_NAME_LENGTH];
@@ -334,7 +364,7 @@ void validate_extern(int **DCL, int lineNumber, int labelFlag, external *extHead
         ef = true;   
         return;
     }
-    else if(!is_alpha_word(token)){
+    else if(!validate_label(token)){
         printf("%d: external's argument needs to be a label name!\n", lineNumber);
         ef = true;
     }
@@ -397,6 +427,7 @@ int validate_instruction_form(char *line, int labelFlag, int lineNumber, int *ar
     /*now we have the command name*/
     if(token == NULL){
         printf("%d: you have to specify command!\n", lineNumber);
+        ef = 1;
         return false;
     }
 

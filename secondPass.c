@@ -132,13 +132,16 @@ int code_immediate(int idx, char *operand, int operandNum, int currOffset, int n
 
 int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int currOffset, int lineNum, int numOfOperands){
     unsigned int address = find_symbol_address(head, operand);
-    address = find_extern_address(extHeadGlobal, operand);
+
     if(address == NOT_FOUND){
+        address = find_extern_address(extHeadGlobal, operand);
+        if(address == NOT_FOUND){
         ef = true;
         printf("error in line %d: %s is not found\n", lineNum, operand);
         return 0;
     }
-
+    }
+    
     if(operandNum == 1){
         if(numOfOperands == 1) {
             cmdWordArr[idx].bits <<= 2 * BITS_IN_METHOD;
@@ -176,12 +179,15 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
     token = strtok(operandCopy, ".");
 
     address = find_symbol_address(head, token);
-    address = find_extern_address(extHeadGlobal, operand);
     if(address == NOT_FOUND){
-        ef = true;
-        printf("error in line %d: %s is not found\n", lineNum, token);
-        return 0;
+        address = find_extern_address(extHeadGlobal, operand);
+        if(address == NOT_FOUND){
+            ef = true;
+            printf("error in line %d: %s is not found\n", lineNum, token);
+            return 0;
+        }   
     }
+    
 
     if(operandNum == 1){
         if(numOfOperands == 1) {
@@ -322,8 +328,8 @@ int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx){
 
     while(operand[1][currOffset] != '\0' && operand[1][currOffset] != '"') {
         dirWordArr[idx + currOffset].bits = operand[1][currOffset] - '\0';
-        print_binary(dirWordArr[idx + currOffset].bits);
-        printf("\n");
+
+
         currOffset++;
     }
     dirWordArr[idx + currOffset].bits = 0;
