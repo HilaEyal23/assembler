@@ -18,8 +18,8 @@ void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolN
     
     cmdLine *cmdPtr = &cmdLines[0];
     dirLine *dirPtr = &dirLines[0];
-    int i;
-    int idx = 0;
+    int i; /*goes over the given lines array one by one*/
+    int idx = 0; /*the index of next empty cell in the binary-code-array*/
     extHeadGlobal = extHead;
 
     for(i=0; i<cmdCnt; i++){ /*encodes instruction commands*/
@@ -68,14 +68,12 @@ int code_cmd_line(cmdLine *cmdPtr, int idx, symbolNode *head){
 
             return idx + offset;
         default:
-           
             return 0;
     }
 }
 
 
 int code_cmd_operand(char *operand, int type, int idx, int currOffset, int operandNum, symbolNode *head, int lineNum, int numOfOperands){
-    /*printf("type: %d\n", type);*/
     switch (type) {
         case IMMEDIATE_OP:
             return code_immediate(idx, operand, operandNum, currOffset, numOfOperands);
@@ -86,7 +84,6 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
         case REG_OP:
             return code_register(idx, operand, operandNum, currOffset, numOfOperands);
         default:
-
             return 0;
     }
 }
@@ -94,8 +91,6 @@ int code_cmd_operand(char *operand, int type, int idx, int currOffset, int opera
 
 int code_immediate(int idx, char *operand, int operandNum, int currOffset, int numOfOperands){
     char positive[MAX_LINE_LENGTH] = {0};
-    /*cmdWordArr[idx].bits <<= BITS_IN_METHOD;
-    cmdWordArr[idx].bits |= IMMEDIATE;*/
 
     if(operandNum == 1){
         if(numOfOperands == 1) {
@@ -142,7 +137,7 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
         ef = true;
         printf("error in line %d: %s is not found\n", lineNum, operand);
         return 0;
-    }
+        }
     }
     
     if(operandNum == 1){
@@ -179,7 +174,7 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
     char operandCopy[MAX_LINE_LENGTH];
 
     strcpy(operandCopy, operand);
-    token = strtok(operandCopy, ".");
+    token = strtok(operandCopy, "."); /*struct-name.field-number*/
     address = find_symbol_address(head, token);
     if(address == NOT_FOUND){
         address = find_extern_address(extHeadGlobal, operand);
@@ -286,36 +281,28 @@ int code_dir_line(dirLine *dirPtr, int idx){
         case STRUCT:
             return code_struct_dir(dirPtr->operands, idx);
         default:
-
             return 0;
     }
 }
 
 int code_data_dir(char operand[][MAX_NAME_LENGTH], int numOfOperands, int idx){
     int currOffset;
-
-
     for(currOffset=0; currOffset < numOfOperands ; currOffset++){
-
         dirWordArr[idx + currOffset].bits = atoi(operand[currOffset]);
-
     }
-
     return idx + currOffset;
 }
+
 
 int code_string_dir(char operand[][MAX_NAME_LENGTH], int idx, int structIdx){
     int currOffset = 0;
 
-
     while(operand[structIdx][currOffset] != '\0' && operand[structIdx][currOffset] != '"') {
-        dirWordArr[idx + currOffset].bits = operand[structIdx][currOffset] - '\0';
-
+        dirWordArr[idx + currOffset].bits = operand[structIdx][currOffset] - '\0'; /* convert argument[1] to int */
         currOffset++;
     }
     dirWordArr[idx + currOffset].bits = 0;
     currOffset++;
-
 
     return idx + currOffset;
 }
@@ -326,18 +313,14 @@ int code_struct_dir(char operand[][MAX_NAME_LENGTH], int idx){
     dirWordArr[idx].bits = atoi(operand[0]);
     currOffset++;
 
-
-
     while(operand[1][currOffset] != '\0' && operand[1][currOffset] != '"') {
-        dirWordArr[idx + currOffset].bits = operand[1][currOffset] - '\0';
-
+        dirWordArr[idx + currOffset].bits = operand[1][currOffset] - '\0'; /* convert argument[1] to int */
 
         currOffset++;
     }
     dirWordArr[idx + currOffset].bits = 0;
     currOffset++;
-
-
+    
     return idx + currOffset;
 }
 
@@ -440,10 +423,6 @@ void create_extern_file(FILE *fp, external *extHead)
 }
 
 
-
-
-
-
 FILE *open_file(char *filename, int type)
 {
     FILE *file;
@@ -461,6 +440,9 @@ FILE *open_file(char *filename, int type)
     return file;
 
 }
+
+
+/****** FUNCTIONS WHICH DEAL WITH DEBUGGING ******/
 
 
 void print_binary(unsigned int number)
