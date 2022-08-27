@@ -118,3 +118,5 @@ void create_entry_file(FILE *file, symbolNode *head, entry *entHead);
 */
 void create_extern_file(FILE *file, external *extHead);
 FILE *open_file(char *filename, int type);
+
+#endif
