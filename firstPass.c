@@ -6,6 +6,8 @@ cmdLine cmdArray[40];
 dirLine dirArray[40];
 extern int dirCnt;
 extern int cmdCnt;
+boolean entryFlag = 0;
+boolean externFlag = 0;
 
 
 /******MAIN FUNTIONS IN FIRST PASS******/
@@ -124,7 +126,7 @@ int get_operand_type(char *op){
 int validate_label(char *token){
     int i;
   if (!isalpha(token[0])){
-        printf("label can not start with digit!\n");
+        printf("illegal label name!\n");
         return false;
     }
         
@@ -192,7 +194,7 @@ void validate_input_form(char input[], int labelFlag, int lineNumber){
         tokens_cnt++;
         if(!check_comma(line[0])){
             skip_spaces(&line);
-            if(line[0] == '\n' || line[0] == EOF){
+            if(line[0] == '\n' || line[0] == EOF || !line[0]){
                 break;
             }
             else{
@@ -210,10 +212,7 @@ void validate_input_form(char input[], int labelFlag, int lineNumber){
             ef = 1;
         }
     }
-    if(comma_cnt >= tokens_cnt){
-        printf("%d: extra text/validate_input_form()!\n", lineNumber);
-        ef = 1;
-    }
+
 
 
 }
@@ -293,7 +292,9 @@ void validate_data(int **DCL, int lineNumber, int labelFlag){
 		strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 		dirArray[dirCnt].operand_cnt++;
         /*we are taking the next token*/
-        token = strtok(NULL, " ,\t\n");
+        if(token != NULL){
+            token = strtok(NULL, " ,\t\n");
+        }
 			
     }
     **DCL = D;
@@ -316,8 +317,9 @@ void validate_string(int **DCL, int lineNumber, int labelFlag){
         }
         token = strtok(token, "\"");
         if(!is_alpha_word(token)){ /*if the argument is null we print error because the argument is missing*/
-            printf("%d: argument is not a number!\n", lineNumber);
+            printf("%d: argument is not a string!\n", lineNumber);
             ef = true;
+            return;
         }
         D = strlen(token)-1;
 		if(ef == 0){
@@ -347,6 +349,7 @@ void validate_entry(int **DCL, int lineNumber, int labelFlag, entry *entHead){
 	strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 	dirArray[dirCnt].operand_cnt++;
     insert_entry(entHead, token);
+    entryFlag = 1;
     **DCL = D;
     
 }
@@ -371,6 +374,7 @@ void validate_extern(int **DCL, int lineNumber, int labelFlag, external *extHead
 	strcpy(dirArray[dirCnt].operands[dirArray[dirCnt].operand_cnt], token);
 	dirArray[dirCnt].operand_cnt++;
     insert_extern(extHead, token);
+    externFlag = 1;
     **DCL = D;
 }
 
@@ -379,6 +383,11 @@ void validate_struct(int **DCL, int lineNumber, int labelFlag){
     char *token;
     int D = 0;
     token = strtok(NULL, " ,\t\n"); /*we take the first argument*/
+    if(token == NULL){
+        printf("%d: missing number argument\n", lineNumber);
+        ef = true;   
+        return;
+    }
     if(!is_number(token)){ /*if the argument is null we print error because the argument is missing*/
         printf("%d: argument is not a number!\n", lineNumber);
         ef = true;
@@ -591,7 +600,7 @@ int is_label(char *token, int lineNumber){
     if(token[strlen(token)-1] != ':') return false;
     /*firstly we have to check if the first letter is a digit, this is unvaild*/
     if (!isalpha(token[0])){
-        printf("%d: label can not start with digit!\n", lineNumber);
+        printf("%d: illegal label name!\n", lineNumber);
         return true;
     }
         

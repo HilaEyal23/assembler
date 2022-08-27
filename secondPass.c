@@ -10,6 +10,8 @@ word dirWordArr[2560];
 extern boolean ef;
 void print_word(int word);
 external *extHeadGlobal;
+extern boolean entryFlag;
+extern boolean externFlag;
 
 void second_pass(cmdLine cmdLines[], dirLine dirLines[], char *fileName, symbolNode *head, entry *entHead, external *extHead)
 {
@@ -134,6 +136,7 @@ int code_direct(int idx, char *operand, int operandNum, symbolNode *head, int cu
     unsigned int address = find_symbol_address(head, operand);
 
     if(address == NOT_FOUND){
+        puts("hi");
         address = find_extern_address(extHeadGlobal, operand);
         if(address == NOT_FOUND){
         ef = true;
@@ -177,7 +180,6 @@ int code_relative(int idx, char *operand, int operandNum, symbolNode *head, int 
 
     strcpy(operandCopy, operand);
     token = strtok(operandCopy, ".");
-
     address = find_symbol_address(head, token);
     if(address == NOT_FOUND){
         address = find_extern_address(extHeadGlobal, operand);
@@ -347,11 +349,11 @@ int create_output_files(char *fileName, symbolNode *head, entry *entHead, extern
     file = open_file(fileName, FILE_OBJECT);
     create_ob_file(file);
 
-    if(1) {
+    if(entryFlag) {
         file = open_file(fileName, FILE_ENTRY);
         create_entry_file(file, head, entHead);
     }
-    if(1){
+    if(externFlag){
         file = open_file(fileName, FILE_EXTERN);
         create_extern_file(file, extHead);
     }
@@ -405,7 +407,7 @@ void create_entry_file(FILE *fp, symbolNode *head, entry *entHead)
     char *base32_address;
     symbolNode *label = head;
    
-    printf("\n\n \t  \t NO ERRORS FOUND \t\t\t\t\t\t\t\t\t \n\n");
+    
     while(entHead){
          while(label)
         {
@@ -417,6 +419,7 @@ void create_entry_file(FILE *fp, symbolNode *head, entry *entHead)
         }
         label = label -> next;
         }
+        label = head;
         entHead = entHead->next;
     }
     fclose(fp);
@@ -424,7 +427,6 @@ void create_entry_file(FILE *fp, symbolNode *head, entry *entHead)
 void create_extern_file(FILE *fp, external *extHead)
 {   int i;
     char *base32_address;
-
     while(extHead){
         for(i = 0; i < cmdCnt; i++){
             if(!strcmp(cmdArray[i].src, extHead->name) || !strcmp(cmdArray[i].dest, extHead->name)){

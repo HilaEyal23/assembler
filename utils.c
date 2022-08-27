@@ -58,7 +58,6 @@ char *convert_to_base_32(unsigned int num)
     base32_seq[0] = base32[extract_bits(num, 5, 9)];
     base32_seq[1] = base32[extract_bits(num, 0, 4)];
     base32_seq[2] = '\0';
-
     return base32_seq;
 }
 
