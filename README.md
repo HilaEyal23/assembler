@@ -7,7 +7,7 @@ Note: the computer model for this project and the given assembly language are im
 *The assembler is based on three steps: preprocess and two passes: <br />
 **Preprocessor** - replaces macros with the corresponding code fragments. <br />
 **First Pass** - parses the input and detectes syntax errors. <br />
-**Second Pass** - encodes the parsed lines in binary (according to the following method) and converts it to 32 base (more details below). At the end it outputs `.ob` file. Moreover, it outputs `.ext` \ `.ent` files as well iff there are .extern and .entry declaretions.* 
+**Second Pass** - encodes the parsed lines in binary (according to the following method) and converts it to base 32 (more details below). Finally it outputs `.ob` file. Furthermore, it outputs `.ext` \ `.ent` files iff .extern and .entry are declared.* 
 
 ### *The Computer Hardware:*
 *The computer in this project consists of a processor (a CPU), 8 registers, and RAM (Random Access Memory).
@@ -18,7 +18,7 @@ The computer works with integers, both positive and negative. There is no suppor
 ### *Encoding Method:*
 *There are two main types of lines which encodes words: instructions and directives. <br /> <br />
 **Instructions Encoding:** <br />
-Each instruction usualy encodes a few word to the memory in the range of 1 to 4, while the first word consists of command and operands adderssing methods and the following words relates to the operands. <br />
+Each instruction usually encodes few word to the memory in the range of 1 to 4, while the first word consists of command and operands adderssing methods and the following words relates to the operands. <br />
 The first word sructure is as the following:*
 
 | opcode        | src addressing method | dest addressing method | A,R,E  |
@@ -81,15 +81,15 @@ The first word sructure is as the following:*
 **.struct** is a declaration of struct. Each structure consist of two fields: a number and a string. The declaration ".struct" encodes to the memory a single integer word (as described above) and a string sequence of words (described above as well). <br />*
 
 *<br />
-**.entry** is a declaration of a lable which is defined in the currend file but may be used in anothers. Entry declaretion does not encodes to the memory but does make the program output `.ent` file as well. <br />*
+**.entry** is a declaration of a label which is defined in the current file but may be used in anothers. Entry declaration does not encodes to the memory but does make the program output `.ent` file as well. <br />*
 
 *<br />
-**.extern** is a declaration of a label which isn't defined in the currend file but in diffrent one. Extern declaretion does not encodes to the memory but does make the program output `.ext` file as well <br />*
+**.extern** is a declaration of a label which isn't defined in the current file but in a diffrent one. Extern declaration does not encodes to the memory but does make the program output `.ext` file as well <br />*
 
 *<br />*
-### *32 Base:*
+### *Base 32:*
  
- *As mentioned above, the final output files are written in 32-Base. The converting is according to the following table: <br />*
+ *As mentioned above, the final output files are written in Base-32. The convertion is executed according to the following table: <br />*
 | decimal       | 32 Base |
 | :-------------: |:-------------:|
 | 0        | ! |
@@ -111,11 +111,11 @@ The first word sructure is as the following:*
 
 
 ### *How To Use?*
-*First downlode the project and make some assembly files with an `.as` extension. Then open the terminal and use the commans "make" in order to complie the project:*
+*First download the project and make some assembly files with an `.as` extension. Then open the terminal and use the commands "make" in order to compile the project:*
 ```C
 > make
 ```
-*<br /> Once compilation succseed, you may run the program on your assembly files by using this command in the terminal:*
+*<br /> Once compiled successfully, you may run the program on your assembly files by using this command in the terminal:*
 ```C
 > ./assembler fileName
 ```
@@ -125,5 +125,5 @@ The first word sructure is as the following:*
 ```
 *Note: `.as` is **not** a part of the file's name.*
 
-*If everything went well, `.am` and `.ob` files will appeare to each file you gave the program. The `.am` file is the preprocessed file and the `.ob` file is the assemblered file. Otherwise, errors should be printed due the standart output. <br />
-<br />Note: there is a limitation on line's length, if you get "core dumped" you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found.*
+*If everything went well, `.am` and `.ob` files will appear per each file processed by the program. The `.am` file is the preprocessed file and the `.ob` file is the assemblered file. Otherwise, errors should be printed due the standard output. <br />
+<br />Note: there is a limitation on lines' length, if "core dumped" appears you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found.*
