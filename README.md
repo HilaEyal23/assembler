@@ -7,7 +7,7 @@ Note: the computer model for this project and the given assembly language are im
 *The assembler is based on three steps: preprocess and two passes: <br />
 **Preprocessor** - replaces macros with the corresponding code fragments. <br />
 **First Pass** - parses the input and detectes syntax errors. <br />
-**Second Pass** - encodes the parsed lines in binary (according to the following method) and converts it to 32 base (more details below). At the end it outputs .ob file and .ext \ .ent files if there are .extern and .entry declaretions.* 
+**Second Pass** - encodes the parsed lines in binary (according to the following method) and converts it to 32 base (more details below). At the end it outputs `.ob` file. Moreover, it outputs `.ext` \ `.ent` files as well iff there are .extern and .entry declaretions.* 
 
 ### *The Computer Hardware:*
 *The computer in this project consists of a processor (a CPU), 8 registers, and RAM (Random Access Memory).
