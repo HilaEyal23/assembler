@@ -126,4 +126,4 @@ The first word sructure is as the following:*
 *Note: `.as` is **not** a part of the file's name.*
 
 *If everything went well, `.am` and `.ob` files will appeare to each file you gave the program. The `.am` file is the preprocessed file and the `.ob` file is the assemblered file. Otherwise, errors should be printed due the standart output. <br />
-<br />Note: there is a limitation on line's length, if you get "core dumped" you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found*
+<br />Note: there is a limitation on line's length, if you get "core dumped" you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found.*
