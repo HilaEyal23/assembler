@@ -11,8 +11,8 @@ Note: the computer model for this project and the given assembly language are im
 
 ### *The Computer Hardware:*
 *The computer in this project consists of a processor (a CPU), 16 registers, and RAM (Random Access Memory).
-A word's size in memory is 10 bits. The RAM size is 265 words while part of the memory is used as a stack.
-The computer only works with integers, both positive and negative. There is no support for real numbers. Arithmetically, it works using the 2's completement method, and it supports characters that are represented in ascii code.*
+A word's size in memory is 10 bits. The RAM size is 265 words while part of the memory is used as a stack. In addition, each register stores a single word (10 bits).
+The computer works with integers, both positive and negative. There is no support for real numbers. Arithmetically, it works using the 2's completement method, and it supports characters that are represented in ascii code.*
 
 
 ### *Encoding Method:*
@@ -61,8 +61,8 @@ The first word sructure is as the following:*
 | 2        | External |
 
 *<br /> <br />
- **Directives Encoding:** <br />
- There are 5 main types of directives: .data, .string, .struct, .entry and .extern. <br />
+ **Directives Encoding:** <br /> 
+ There are 5 main types of directives: .data, .string, .struct, .entry and .extern. <br /> <br />
  **.data** is a declaration of integers array. Each integer encodes a single word to the memory according to the following structure: <br />*
  
  | value (binary) | A,R,E |
@@ -81,10 +81,10 @@ The first word sructure is as the following:*
 **.struct** is a declaration of struct. Each structure consist of two fields: a number and a string. The declaration ".struct" encodes to the memory a single integer word (as described above) and a string sequence of words (described above as well). <br />*
 
 *<br />
-**.entry** is a declaration of a lable which is defined in the currend file but may be used in anothers. <br />*
+**.entry** is a declaration of a lable which is defined in the currend file but may be used in anothers. Entry declaretion does not encodes to the memory but does make the program output `.ent` file as well. <br />*
 
 *<br />
-**.extern** is a declaration of a label which isn't defined in the currend file but in diffrent one. <br />*
+**.extern** is a declaration of a label which isn't defined in the currend file but in diffrent one. Extern declaretion does not encodes to the memory but does make the program output `.ext` file as well <br />*
 
 *<br />*
 ### *32 Base:*
@@ -126,4 +126,4 @@ The first word sructure is as the following:*
 *Note: `.as` is **not** a part of the file's name.*
 
 *If everything went well, `.am` and `.ob` files will appeare to each file you gave the program. The `.am` file is the preprocessed file and the `.ob` file is the assemblered file. Otherwise, errors should be printed due the standart output. <br />
-Note: there is a limitation on line's length, if you get "core dumped" you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found*
+<br />Note: there is a limitation on line's length, if you get "core dumped" you better check you haven't crossed the limit. Moreover "core dumped" may appraer in case the given file wasn't found*
