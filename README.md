@@ -1,6 +1,6 @@
 # *assembler*
 
-*The final project of the C course (20465) at The Open University.
+*The final project of the C course (20465) at The Open University.<br />
 Note: the computer model for this project and the given assembly language are imaginary.*
 
 ### *Double Pass Model:*
