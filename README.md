@@ -11,7 +11,7 @@ Note: the computer model for this project and the given assembly language are im
 
 ### *The Computer Hardware:*
 *The computer in this project consists of a processor (a CPU), 16 registers, and RAM (Random Access Memory).
-A word's size in memory is 10 bits. The RAM size is 265 words while part of the memory is used as a stack. In addition, each register stores a single word (10 bits).
+A word's size in memory is 10 bits. The RAM size is 265 words while part of the memory is used as a stack. In addition, each register stores a single word.
 The computer works with integers, both positive and negative. There is no support for real numbers. Arithmetically, it works using the 2's completement method, and it supports characters that are represented in ascii code.*
 
 
