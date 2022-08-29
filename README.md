@@ -76,7 +76,7 @@ The first word sructure is as the following:*
 | :-------------: |:-------------:|
 | 9 - 2 | 1 - 0 |
 
-*In addition, each string encodes '\0' at it's end, which is acctualy 0-word. <br />*
+*In addition, each string encodes '\0' at it's end, which is actually 0-word. <br />*
 *<br />
 **.struct** is a declaration of struct. Each structure consist of two fields: a number and a string. The declaration ".struct" encodes to the memory a single integer word (as described above) and a string sequence of words (described above as well). <br />*
 
